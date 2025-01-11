@@ -4,9 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../projects/index.html">Projects</a></li>
+            <li><a href="../CV/index.html">Resume</li>
+            <li><a href="../contact/index.html">Contact</a></li>
+            <li><a href="https://github.com/yaf008" target="_blank">GitHub Profile</a></li>
+        </ul>
+    </nav>
+
     <h1>Contact</h1>
+
+    <form action="mailto:your_email@example.com" method="POST" enctype="text/plain">
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="sample@example.com" required><br><br>
+
+        <label for="name">Name:</label>
+        <input id="name" name="name" value="sample name" required><br><br>
+
+        <label for="messgae">Body:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required>This is a sample message.</textarea><br><br>
+
+        <button type="submit">Submit</button>
+
+    
+    </form>
 
     
 </body>
