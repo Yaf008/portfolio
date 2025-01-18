@@ -5,6 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --color-accent: oklch(65% 50% 0); /* Defines an accent color */
+        }
+
+        html, body {
+            max-width: 100ch;
+            padding: 3rem;
+            margin-inline: auto;
+            accent-color: var(--color-accent); /* Apply accent color */
+        }
+
+        body {
+            max-width: 100ch;
+            padding: 1rem; 
+            margin-inline: auto;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Navigation bar style */
+        nav {
+            margin-bottom: 1rem; 
+            display: flex; /* Enable Flexbox layout */
+            background-color: #ffffff;
+            padding: 0.5em 0; 
+        }
+
+        nav a {
+            flex: 1; /* Each navigation item occupies the same space */
+            text-align: center;
+            padding: 0.5em; 
+            text-decoration: none; /* Remove the underscore */
+            color: inherit; /* Inherits the text color */
+            border-right: 1px solid #ddd;/* Separator line between each link */
+            border-bottom: 1px solid oklch(80% 3% 200);
+        }
+
+        nav a:last-child {
+            border-right: none; /* Removes the right border of the last link */
+        }
+
+
+        nav a:hover {
+            border-bottom: 5.6px solid var(--color-accent); /* Hover accent color */
+            background-color: oklch(from var(--color-accent) 95% 5% h)
+        }
+
+
+        
+        nav a.current {
+            border-bottom: 6px solid oklch(80% 3% 200); /* Thicker border under the current page */
+            padding-bottom: calc(0.5rem - 0.2rem); /* Compensates for height offset */
+            
+        }   
+        
+        ul {
+             display: contents; 
+        }
+
+        li {
+            display: contents; 
+        }
+
+        
+        form {
+        display: grid; /* Enable CSS Grid */
+        grid-template-columns: auto 1fr; 
+        gap: 1rem; 
+        max-width: 600px; 
+        margin: 2rem auto; 
+        }
+
+        label {
+        grid-column: 1 / 2; 
+        align-self: center; 
+        margin: 0; 
+        }
+
+        input,
+        textarea
+        {
+        grid-column: 2 / 3; /* Input controls occupy the second column */
+        width: 100%; 
+        padding: 0.5rem; 
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        box-sizing: border-box; 
+        font: inherit; 
+        }
+
+        button {
+        grid-column: 1 / -1;/* button spans two columns */
+        padding: 0.75rem;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px; 
+        transition: background-color 0.3s;
+        }
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+
+
 </head>
 <body>
     <nav>
@@ -12,7 +125,7 @@
             <li><a href="../index.html">Home</a></li>
             <li><a href="../projects/index.html">Projects</a></li>
             <li><a href="../CV/index.html">Resume</a></li>
-            <li><a href="../contact/index.html">Contact</a></li>
+            <li><a href="../contact/index.html" class="current">Contact</a></li>
             <li><a href="https://github.com/yaf008" target="_blank">GitHub Profile</a></li>
         </ul>
     </nav>
@@ -22,13 +135,13 @@
     <form action="mailto:your_email@example.com" method="POST" enctype="text/plain">
         
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="sample@example.com" required><br><br>
+        <input type="email" id="email" name="email" value="sample@example.com" required>
 
         <label for="name">Name:</label>
-        <input id="name" name="name" value="sample name" required><br><br>
+        <input id="name" name="name" value="sample name" required>
 
-        <label for="messgae">Body:</label><br>
-        <textarea id="message" name="message" rows="4" cols="50" required>This is a sample message.</textarea><br><br>
+        <label for="messgae">Message:</label>
+        <textarea id="message" name="message" rows="4" cols="50" required >This is a sample message.</textarea>
 
         <button type="submit">Submit</button>
 
