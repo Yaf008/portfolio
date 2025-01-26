@@ -30,11 +30,8 @@ document.body.prepend(nav);
 
 
 for (let p of pages) {
-  let url = p.url;
+  let url = p.url.startsWith('http') ? p.url : '/' + p.url; // 确保以根目录为基础
   let title = p.title;
-
-  
-  url = !ARE_WE_HOME && !url.startsWith('http') ? '../' + url : url;
 
 
   let a = document.createElement('a');
