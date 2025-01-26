@@ -4,52 +4,57 @@ function $$(selector, context = document) {
   return Array.from(context.querySelectorAll(selector));
 }
 
-//get an array of all nav links
+// Get an array of all nav links
 const navLinks = $$("nav a");
 
-//find the link in current page
+// Find the link in the current page
 let currentLink = navLinks.find(
   (a) => a.host === location.host && a.pathname === location.pathname
 );
-//add current class
+// Add current class
 currentLink?.classList.add('current');
 
+// Define your pages
 let pages = [
   { url: '', title: 'Home' },
-  { url: 'projects/', title: 'Projects' },
-  { url: 'CV/', title: 'Resume' },
-  { url: 'contact/', title: 'Contact' },
+  { url: 'projects.html', title: 'Projects' },
+  { url: 'resume.html', title: 'Resume' },
+  { url: 'contact.html', title: 'Contact' },
   { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
 ];
 
-const ARE_WE_HOME = document.documentElement.classList.contains('home');
+// Adjust base path for GitHub Pages (update '/portfolio/' to your repository name)
+const BASE_PATH = '/portfolio/';
 
+// Determine if we are on the home page
+const ARE_WE_HOME = location.pathname === BASE_PATH || location.pathname === BASE_PATH + 'index.html';
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
-
 
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  
-  url = !ARE_WE_HOME && !url.startsWith('http') ? '../' + url : url;
-
+  // Adjust URL for GitHub Pages
+  if (!ARE_WE_HOME && !url.startsWith('http')) {
+    url = BASE_PATH + url;
+  } else if (ARE_WE_HOME && !url.startsWith('http')) {
+    url = './' + url;
+  }
 
   let a = document.createElement('a');
   a.href = url;
   a.textContent = title;
 
-  
+  // Highlight current page
   a.classList.toggle(
     'current',
     a.host === location.host && a.pathname === location.pathname
   );
 
-  
+  // Open external links in a new tab
   a.toggleAttribute('target', a.host !== location.host);
-
 
   nav.append(a);
 }
