@@ -1,6 +1,82 @@
+
+:root {
+  --color-accent: oklch(65% 50% 0); /* Accent color */
+  --border-color-light: oklch(50% 10% 200 / 40%); /* Light mode border color */
+  --border-color-dark: oklch(30% 20% 200 / 40%); 
+  --text-color-light: #000000; 
+  --text-color-dark: #ffffff; 
+}
+
+
+html {
+  color-scheme: light dark;
+}
+
+
 body {
-    /* Set line height to 1.5 times the font size
-         and use the OS’s UI font as the website font
-       */
-    font: 100%/1.5 system-ui;
+  max-width: 100ch;
+  padding: 1rem;
+  margin-inline: auto;
+  font-family: Arial, sans-serif;
+  font: 100%/1.5 system-ui;
+  background-color: canvas; /* Switch background according to light/dark mode */
+  color: canvastext; /* Switch text color according to light/dark mode*/
+}
+
+/* 导航栏样式 */
+nav {
+  margin-bottom: 1rem;
+  display: flex;
+  background-color: var(--nav-bg-light); 
+  padding: 2em 0;
+  transition: background-color 0.3s ease; 
+}
+
+nav a {
+  flex: 1;
+  text-align: center;
+  padding: 0.5em;
+  text-decoration: none;
+  color: inherit; 
+  border-bottom: 1px solid var(--border-color-light);
+  transition: background-color 0.3s ease, color 0.3s ease, border-bottom 0.3s ease;
+}
+
+nav a:hover {
+  border-bottom: 5.6px solid var(--color-accent);
+  background-color: color-mix(in oklch, var(--color-accent), canvas 85%);
+}
+
+nav a.current {
+  border-bottom: 6px solid var(--color-accent);
+  padding-bottom: calc(0.5rem - 0.2rem);
+}
+
+/* 暗模式适配 */
+@media (prefers-color-scheme: dark) {
+  nav {
+    background-color: var(--nav-bg-dark); 
   }
+
+  nav a {
+    color: var(--text-color-dark); 
+    border-bottom: 1px solid var(--border-color-dark); 
+  }
+
+  nav a.current {
+    background-color: #444; 
+    border-bottom: 6px solid var(--color-accent); 
+  }
+}
+
+.color-scheme {
+  position: absolute;
+  top: 1rem;
+  right: 15rem;
+  font-size: 80%;
+  font-family: inherit;
+}
+.color-scheme select {
+  font-size: inherit;
+  padding: rem;
+}

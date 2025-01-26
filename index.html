@@ -3,93 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yajing Fang:Personal site and portfolio</title>
+    <title>Yajing Fang: Personal Site and Portfolio</title>
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        :root {
-            --color-accent: oklch(65% 50% 0); /* Defines an accent color */
-        }
-
-        html, body {
-            max-width: 100ch;
-            padding: 1rem;
-            margin-inline: auto;
-            accent-color: var(--color-accent); /* Apply accent color */
-        }
-
-        body {
-            max-width: 100ch;
-            padding: 1rem; 
-            margin-inline: auto;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Navigation bar style */
-        nav {
-            margin-bottom: 1rem; 
-            display: flex; /* Enable Flexbox layout */
-            background-color: #ffffff;
-            padding: 0.5em 0; 
-        }
-
-        nav a {
-            flex: 1; /* Each navigation item occupies the same space */
-            text-align: center;
-            padding: 0.5em; 
-            text-decoration: none; /* Remove the underscore */
-            color: inherit; /* Inherits the text color */
-            border-right: 1px solid #ddd;/* Separator line between each link */
-            border-bottom: 1px solid oklch(80% 3% 200);
-        }
-
-        nav a:last-child {
-            border-right: none; /* Removes the right border of the last link */
-        }
-
-
-        nav a:hover {
-            border-bottom: 5.6px solid var(--color-accent); /* Hover accent color */
-            background-color: oklch(from var(--color-accent) 95% 5% h)
-        }
-
-
-        
-        nav a.current {
-            border-bottom: 6px solid oklch(80% 3% 200); /* Thicker border under the current page */
-            padding-bottom: calc(0.5rem - 0.2rem); /* Compensates for height offset */
-            
-        }   
-        
-        ul {
-             display: contents; 
-        }
-
-        li {
-            display: contents; 
-        }
-
-    </style>
+    <script type="module" src="global.js" defer></script>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="index.html" class="current">Home</a></li>
-            <li><a href="projects/index.html">Projects</a></li>
-            <li><a href="CV/index.html">Resume</a></li>
-            <li><a href="contact/index.html">Contact</a></li>
-            <li><a href="https://github.com/yaf008" target="_blank">GitHub Profile</a></li>
-        </ul>
-    </nav>
-
-
-
     <h1>Yajing Fang</h1>
     <p>I am a senior student at UCSD, majoring in Business Economics with a minor in Data Science. 
     I chose Data Science as my minor because I aspire to use its tools and techniques to analyze business and financial data. 
     My goal is to leverage data-driven insights to make informed decisions and drive impactful results in the field of finance and economics.</p>
-    <img src="images/yajing_fang.jpg" alt="photo was took during Christmas holiday in Reno" style="width:600px;height:auto;">
-    <p>This photo was took during Christmas holiday in Reno </p>
-    
+    <img src="images/yajing_fang.jpg" alt="Photo was taken during the Christmas holiday in Reno" style="width:600px;height:auto;">
+    <p>This photo was taken during the Christmas holiday in Reno.</p>
 </body>
 </html>

@@ -4,110 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects</title>
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        :root {
-            --color-accent: oklch(65% 50% 0); /* Defines an accent color */
-        }
-
-        html, body {
-            max-width: 100ch;
-            padding: 1rem;
-            margin-inline: auto;
-            accent-color: var(--color-accent); /* Apply accent color */
-        }
-
-        body {
-            max-width: 100ch;
-            padding: 1rem; 
-            margin-inline: auto;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Navigation bar style */
-        nav {
-            margin-bottom: 1rem; 
-            display: flex; /* Enable Flexbox layout */
-            background-color: #ffffff;
-            padding: 0.5em 0; 
-        }
-
-        nav a {
-            flex: 1; /* Each navigation item occupies the same space */
-            text-align: center;
-            padding: 0.5em; 
-            text-decoration: none; /* Remove the underscore */
-            color: inherit; /* Inherits the text color */
-            border-right: 1px solid #ddd;/* Separator line between each link */
-            border-bottom: 1px solid oklch(80% 3% 200);
-        }
-
-        nav a:last-child {
-            border-right: none; /* Removes the right border of the last link */
-        }
-
-
-        nav a:hover {
-            border-bottom: 5.6px solid var(--color-accent); /* Hover accent color */
-            background-color: oklch(from var(--color-accent) 95% 5% h)
-        }
-
-
-        
-        nav a.current {
-            border-bottom: 6px solid oklch(80% 3% 200); /* Thicker border under the current page */
-            padding-bottom: calc(0.5rem - 0.2rem); /* Compensates for height offset */
-            
-        }   
-        
-        ul {
-             display: contents; 
-        }
-
-        li {
-            display: contents; 
-        }
-
-        .projects {
-        display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); 
-        gap: 1rem; 
-        padding: 1rem; 
-        }
-
-        article {
-        display: grid; 
-        grid-template-rows: subgrid; 
-        grid-row: span 3;
-        gap: 1rem; 
-        }
-
-        h2 {
-        margin: 0; 
-        font-size: 1.2rem; 
-        margin-bottom: 0.5em; 
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-        line-height: 1.1; 
-        text-wrap: balance; 
-        margin: 0.5em 0; 
-        }
-
-    </style>
+    <link rel="stylesheet" href="../style.css">
+    <script type="module" src="../global.js"></script>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="../index.html">Home</a></li>
-            <li><a href="../projects/index.html" class="current">Projects</a></li>
-            <li><a href="../CV/index.html">Resume</a></li>
-            <li><a href="../contact/index.html">Contact</a></li>
-            <li><a href="https://github.com/yaf008" target="_blank">GitHub Profile</a></li>
-        </ul>
-    </nav>
-
+    
     <h1>Projects</h1>
     <div class="projects">
         <article>
@@ -171,6 +72,8 @@
             <p>Incidunt voluptate laboriosam blanditiis iusto. Aspernatur accusamus quaerat nemo rem deleniti doloribus, molestias maxime nostrum eveniet, eos natus quae veritatis dolore sunt, dolores voluptate saepe unde sapiente numquam tempore porro.</p>
         </article>
     </div>
+
+    
 
 </body>
 </html>
