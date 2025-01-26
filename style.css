@@ -1,4 +1,3 @@
-
 :root {
   --color-accent: oklch(65% 50% 0); /* Accent color */
   --border-color-light: oklch(50% 10% 200 / 40%); /* Light mode border color */
@@ -80,3 +79,4 @@ nav a.current {
   font-size: inherit;
   padding: rem;
 }
+

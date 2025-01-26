@@ -4,57 +4,52 @@ function $$(selector, context = document) {
   return Array.from(context.querySelectorAll(selector));
 }
 
-// Get an array of all nav links
+//get an array of all nav links
 const navLinks = $$("nav a");
 
-// Find the link in the current page
+//find the link in current page
 let currentLink = navLinks.find(
   (a) => a.host === location.host && a.pathname === location.pathname
 );
-// Add current class
+//add current class
 currentLink?.classList.add('current');
 
-// Define your pages
 let pages = [
   { url: '', title: 'Home' },
-  { url: 'projects.html', title: 'Projects' },
-  { url: 'resume.html', title: 'Resume' },
-  { url: 'contact.html', title: 'Contact' },
+  { url: 'projects/', title: 'Projects' },
+  { url: 'CV/', title: 'Resume' },
+  { url: 'contact/', title: 'Contact' },
   { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
 ];
 
-// Adjust base path for GitHub Pages (update '/portfolio/' to your repository name)
-const BASE_PATH = '/portfolio/';
+const ARE_WE_HOME = document.documentElement.classList.contains('home');
 
-// Determine if we are on the home page
-const ARE_WE_HOME = location.pathname === BASE_PATH || location.pathname === BASE_PATH + 'index.html';
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
+
 
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  // Adjust URL for GitHub Pages
-  if (!ARE_WE_HOME && !url.startsWith('http')) {
-    url = BASE_PATH + url;
-  } else if (ARE_WE_HOME && !url.startsWith('http')) {
-    url = './' + url;
-  }
+  
+  url = !ARE_WE_HOME && !url.startsWith('http') ? '../' + url : url;
+
 
   let a = document.createElement('a');
   a.href = url;
   a.textContent = title;
 
-  // Highlight current page
+  
   a.classList.toggle(
     'current',
     a.host === location.host && a.pathname === location.pathname
   );
 
-  // Open external links in a new tab
+  
   a.toggleAttribute('target', a.host !== location.host);
+
 
   nav.append(a);
 }
@@ -116,4 +111,3 @@ form?.addEventListener('submit', (event) => {
   
     location.href = url;
 });
-
