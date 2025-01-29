@@ -15,12 +15,13 @@ let currentLink = navLinks.find(
 currentLink?.classList.add('current');
 
 let pages = [
-  { url: '', title: 'Home' },
-  { url: './projects/', title: 'Projects' },
-  { url: './CV/', title: 'Resume' },
-  { url: './contact/', title: 'Contact' },
+  { url: '/', title: 'Home' },  // 改成 '/' 让它始终回到根目录
+  { url: '/projects/', title: 'Projects' },
+  { url: '/CV/', title: 'Resume' },
+  { url: '/contact/', title: 'Contact' },
   { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
 ];
+
 
 const ARE_WE_HOME = document.documentElement.classList.contains('home');
 
@@ -34,7 +35,7 @@ for (let p of pages) {
   let title = p.title;
 
   
-  url = !ARE_WE_HOME && !url.startsWith('http') ? './' + url : url;
+  url = url.startsWith('http') ? url : `${url}
 
 
   let a = document.createElement('a');
