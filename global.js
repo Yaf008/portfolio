@@ -16,9 +16,9 @@ currentLink?.classList.add('current');
 
 let pages = [
   { url: '', title: 'Home' },
-  { url: 'projects/', title: 'Projects' },
-  { url: 'CV/', title: 'Resume' },
-  { url: 'contact/', title: 'Contact' },
+  { url: 'projects/index.html', title: 'Projects' },
+  { url: 'CV/index.html', title: 'Resume' },
+  { url: 'contact/index.html', title: 'Contact' },
   { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
 ];
 
