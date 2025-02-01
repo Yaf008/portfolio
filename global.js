@@ -1,24 +1,5 @@
 console.log('IT’S ALIVE!');
 
-function $$(selector, context = document) {
-  return Array.from(context.querySelectorAll(selector));
-}
-
-//get an array of all nav links
-const navLinks = $$("nav a");
-
-//find the link in current page
-let currentLink = navLinks.find(
-  (a) => a.host === location.host && a.pathname === location.pathname
-);
-//add current class
-currentLink?.classList.add('current');
-
-if (currentLink) {
-  // or if (currentLink !== undefined)
-  currentLink.classList.add('current');
-}
-
 let pages = [
   { url: '', title: 'Home' },
   { url: 'projects/', title: 'Projects' },
@@ -28,12 +9,11 @@ let pages = [
 ];
 
 
-const ARE_WE_HOME = document.documentElement.classList.contains('home');
-
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
+const ARE_WE_HOME = document.documentElement.classList.contains('home');
 
 for (let p of pages) {
   let url = p.url;
@@ -56,6 +36,32 @@ for (let p of pages) {
   }
  
 }
+
+
+//get an array of all nav links
+//const navLinks = $$("nav a");
+
+//find the link in current page
+//let currentLink = navLinks.find(
+  //(a) => a.host === location.host && a.pathname === location.pathname
+//);
+//add current class
+//currentLink?.classList.add('current');
+
+//if (currentLink) {
+  // or if (currentLink !== undefined)
+ /// currentLink.classList.add('current');
+//}
+
+
+
+
+
+
+
+
+
+
 
 
 
