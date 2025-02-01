@@ -1,14 +1,12 @@
-console.log('IT’S ALIVE!');
+console.log("IT’S ALIVE!");
 
 let pages = [
   { url: '', title: 'Home' },
   { url: 'projects/', title: 'Projects' },
   { url: 'CV/', title: 'Resume' },
   { url: 'contact/', title: 'Contact' },
-  { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
+  { url: 'https://github.com/Yaf008', title: 'GitHub' }
 ];
-
-
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
@@ -19,8 +17,8 @@ for (let p of pages) {
   let url = p.url;
   let title = p.title;
   
-  url = !ARE_WE_HOME && !url.startsWith('http')?'../'+ url : url;
-
+  url = (!ARE_WE_HOME && url && !url.startsWith('http')) ? '../' + url : url;
+  console.log("生成的 URL:", url);  // 调试信息
 
   let a = document.createElement('a');
   a.href = url;
@@ -31,10 +29,9 @@ for (let p of pages) {
     a.classList.add('current');
   }
 
-  if(a.host!=location.host){
-    a.target ='_blank'
+  if (a.host !== location.host) {
+    a.target = '_blank';
   }
- 
 }
 
 
