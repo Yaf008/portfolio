@@ -14,11 +14,16 @@ let currentLink = navLinks.find(
 //add current class
 currentLink?.classList.add('current');
 
+if (currentLink) {
+  // or if (currentLink !== undefined)
+  currentLink.classList.add('current');
+}
+
 let pages = [
-  { url: '/', title: 'Home' },  // 改成 '/' 让它始终回到根目录
-  { url: '/projects/', title: 'Projects' },
-  { url: '/CV/', title: 'Resume' },
-  { url: '/contact/', title: 'Contact' },
+  { url: '', title: 'Home' },
+  { url: 'projects/', title: 'Projects' },
+  { url: 'CV/', title: 'Resume' },
+  { url: 'contact/', title: 'Contact' },
   { url: 'https://github.com/yaf008', title: 'GitHub Profile' },
 ];
 
@@ -33,26 +38,23 @@ document.body.prepend(nav);
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
-
   
-  url = url.startsWith('http') ? url : `${url}
+  url = !ARE_WE_HOME && !url.startsWith('http')?'../'+ url : url;
 
 
   let a = document.createElement('a');
   a.href = url;
   a.textContent = title;
-
-  
-  a.classList.toggle(
-    'current',
-    a.host === location.host && a.pathname === location.pathname
-  );
-
-  
-  a.toggleAttribute('target', a.host !== location.host);
-
-
   nav.append(a);
+
+  if (a.host === location.host && a.pathname === location.pathname) {
+    a.classList.add('current');
+  }
+
+  if(a.host!=location.host){
+    a.target ='_blank'
+  }
+ 
 }
 
 
