@@ -3,10 +3,11 @@ console.log("IT’S ALIVE!");
 let pages = [
   { url: '', title: 'Home' },
   { url: 'projects/', title: 'Projects' },
-  { url: 'CV/', title: 'Resume' },
+  { url: 'CV/', title: 'Resume' },  // 修正 title 拼写
   { url: 'contact/', title: 'Contact' },
   { url: 'https://github.com/Yaf008', title: 'GitHub' }
 ];
+console.log("脚本仍在运行，pages 数组已定义");
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
@@ -16,9 +17,9 @@ const ARE_WE_HOME = document.documentElement.classList.contains('home');
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
-  
-  url = (!ARE_WE_HOME && url && !url.startsWith('http')) ? '../' + url : url;
-  console.log("生成的 URL:", url);  // 调试信息
+
+  url = (!ARE_WE_HOME && url && !url.startsWith('http')) ? './' + url : url;
+  console.log("生成的 URL:", url);  // 这里检查是否输出
 
   let a = document.createElement('a');
   a.href = url;
@@ -33,6 +34,8 @@ for (let p of pages) {
     a.target = '_blank';
   }
 }
+
+console.log("脚本执行完毕");
 
 
 //get an array of all nav links
