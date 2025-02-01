@@ -3,37 +3,51 @@ console.log("IT’S ALIVE!");
 let pages = [
   { url: '', title: 'Home' },
   { url: 'projects/', title: 'Projects' },
-  { url: 'CV/', title: 'Resume' },  // 修正 title 拼写
+  { url: 'CV/', title: 'Resume' },
   { url: 'contact/', title: 'Contact' },
   { url: 'https://github.com/Yaf008', title: 'GitHub' }
 ];
+
 console.log("脚本仍在运行，pages 数组已定义");
 
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
-const ARE_WE_HOME = document.documentElement.classList.contains('home');
+const ARE_WE_HOME = location.pathname === '/';
+
+let links = [];
 
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  url = (!ARE_WE_HOME && url && !url.startsWith('http')) ? './' + url : url;
-  console.log("生成的 URL:", url);  // 这里检查是否输出
+  // 修正相对路径问题
+  if (!url.startsWith('http')) {
+    url = ARE_WE_HOME ? `/${url}` : `/${url}`;
+  }
+  console.log("生成的 URL:", url);
 
   let a = document.createElement('a');
   a.href = url;
   a.textContent = title;
   nav.append(a);
+  links.push(a); // 存储所有链接
 
-  if (a.host === location.host && a.pathname === location.pathname) {
-    a.classList.add('current');
-  }
-
+  // 外部链接新窗口打开
   if (a.host !== location.host) {
     a.target = '_blank';
   }
 }
+
+// **优化 current 类添加**
+let currentLink = links.find(link => {
+  let linkPath = new URL(link.href, location.origin).pathname;
+  let currentPath = location.pathname.endsWith("/") ? location.pathname : location.pathname + "/";
+  return linkPath === currentPath;
+});
+
+// **安全地添加 `current` 类**
+currentLink?.classList.add('current');
 
 console.log("脚本执行完毕");
 
