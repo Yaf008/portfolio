@@ -13,7 +13,7 @@ console.log("脚本仍在运行，pages 数组已定义");
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
-const ARE_WE_HOME = location.pathname === '/';
+const REPO_NAME = location.pathname.split('/')[1] || ''; // 动态获取仓库名称
 
 let links = [];
 
@@ -21,9 +21,9 @@ for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  // 修正相对路径问题
+  // 修正路径问题
   if (!url.startsWith('http')) {
-    url = ARE_WE_HOME ? `/${url}` : `/${url}`;
+    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // 确保路径格式正确
   }
   console.log("生成的 URL:", url);
 
@@ -31,7 +31,7 @@ for (let p of pages) {
   a.href = url;
   a.textContent = title;
   nav.append(a);
-  links.push(a); // 存储所有链接
+  links.push(a);
 
   // 外部链接新窗口打开
   if (a.host !== location.host) {
@@ -39,17 +39,18 @@ for (let p of pages) {
   }
 }
 
-// **优化 current 类添加**
+// 优化 current 类添加
 let currentLink = links.find(link => {
-  let linkPath = new URL(link.href, location.origin).pathname;
-  let currentPath = location.pathname.endsWith("/") ? location.pathname : location.pathname + "/";
+  let linkPath = new URL(link.href, location.origin).pathname.replace(/\/$/, '');
+  let currentPath = location.pathname.replace(/\/$/, '');
   return linkPath === currentPath;
 });
 
-// **安全地添加 `current` 类**
+// 安全地添加 `current` 类
 currentLink?.classList.add('current');
 
 console.log("脚本执行完毕");
+
 
 
 //get an array of all nav links
