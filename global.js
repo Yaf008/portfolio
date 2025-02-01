@@ -54,33 +54,6 @@ console.log("脚本执行完毕");
 
 
 
-//get an array of all nav links
-//const navLinks = $$("nav a");
-
-//find the link in current page
-//let currentLink = navLinks.find(
-  //(a) => a.host === location.host && a.pathname === location.pathname
-//);
-//add current class
-//currentLink?.classList.add('current');
-
-//if (currentLink) {
-  // or if (currentLink !== undefined)
- /// currentLink.classList.add('current');
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -137,3 +110,21 @@ form?.addEventListener('submit', (event) => {
     location.href = url;
 });
 
+//lab4 java II
+
+export async function fetchJSON(url) {
+  try {
+      // Fetch the JSON file from the given URL
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.statusText}`);
+    }
+
+
+  } catch (error) {
+      console.error('Error fetching or parsing JSON data:', error);
+  }
+}
+
+console.log(response)
