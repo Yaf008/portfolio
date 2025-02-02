@@ -121,9 +121,15 @@ export async function fetchJSON(url) {
         throw new Error(`Failed to fetch projects: ${response.statusText}`);
     }
 
+    const data = await response.json();
+    console.log("获取的数据:", data); // 打印获取的数据
 
-  } catch (error) {
-      console.error('Error fetching or parsing JSON data:', error);
+
+  // 返回解析后的数据
+  return data;
+} catch (error) {
+  console.error('获取或解析 JSON 数据时出错:', error);
+  return null; // 如果出错，返回 null
   }
 }
 
