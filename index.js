@@ -13,3 +13,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 });
+
+
+import { fetchGitHubData } from './global.js';
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const githubContainer = document.querySelector('.github-stats');
+    if (githubContainer) {
+        const githubData = await fetchGitHubData('yaf008'); // ✅ 你的 GitHub 用户名
+        if (githubData) {
+            githubContainer.innerHTML = `
+                <h2>GitHub Statistics</h2>
+                <p><strong>Followers:</strong> ${githubData.followers}</p>
+                <p><strong>Following:</strong> ${githubData.following}</p>
+                <p><strong>Public Repos:</strong> ${githubData.public_repos}</p>
+                <p><strong>GitHub Profile:</strong> <a href="${githubData.html_url}" target="_blank">${githubData.html_url}</a></p>
+            `;
+        } else {
+            githubContainer.innerHTML = "<p>无法加载 GitHub 数据。</p>";
+        }
+    }
+});

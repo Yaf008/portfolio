@@ -160,3 +160,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+//github data
+export async function fetchGitHubData(username) {
+  try {
+      const response = await fetch(`https://api.github.com/users/${username}`);
+      if (!response.ok) {
+          throw new Error(`GitHub API 请求失败: ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log("GitHub 数据:", data);  // 调试信息
+      return data;
+  } catch (error) {
+      console.error('获取 GitHub 数据时出错:', error);
+      return null;
+  }
+}
