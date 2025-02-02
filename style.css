@@ -98,3 +98,24 @@ nav a.current {
 .projects article:hover {
   transform: scale(1.05);
 }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 列布局 */
+  gap: 10px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  max-width: 400px;
+}
+
+.profile-grid dt {
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.profile-grid dd {
+  margin: 0;
+  text-align: left;
+}
