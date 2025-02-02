@@ -7,107 +7,11 @@
     <link rel="stylesheet" href="../style.css">
     <script src="../global.js" type="module" defer></script> 
     
-    <script type="module">
-        import { fetchJSON } from '../global.js';
-      
-        // 定义 JSON 文件的路径
-        const projectsURL = '../lib/projects.json'; // 根据需要调整路径
-      
-        // 获取项目数据
-        fetchJSON(projectsURL).then(projects => {
-          if (projects) {
-            // 获取项目的容器
-            const projectsContainer = document.querySelector('.projects');
-      
-            if (projectsContainer) {
-              // 清除现有内容
-              projectsContainer.innerHTML = '';
-      
-              // 遍历项目并创建 HTML 元素
-              projects.forEach(project => {
-                const article = document.createElement('article');
-                article.innerHTML = `
-                  <h2>${project.title}</h2>
-                  <img src="${project.image}" alt="${project.title}">
-                  <p>${project.description}</p>
-                `;
-                projectsContainer.appendChild(article);
-              });
-            }
-          }
-        });
-      </script>
-    
 </head>
 <body>
     
-    <h1>Projects</h1>
-    <div class="projects">
-        <article>
-            <h2>Lorem ipsum dolor sit.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Architecto deserunt possimus, ex perferendis quos rerum veniam, explicabo minus minima consequuntur laudantium labore consectetur facilis vero autem porro dolore, quibusdam alias.</p>
-        </article>
-        <article>
-            <h2>Assumenda non eos dignissimos.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Inventore asperiores cumque molestias magni, unde laboriosam dolorum vero voluptatum temporibus ad iusto quo quaerat numquam provident explicabo a. Atque ipsam consectetur vel harum molestiae modi cum tempore possimus. Dolorem?</p>
-        </article>
-        <article>
-            <h2>Est similique magni dicta.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Aspernatur optio et, facere accusamus recusandae quo non atque sapiente vitae exercitationem nesciunt, nemo placeat voluptate. Harum cumque temporibus totam, enim, maiores omnis dolores dolorum molestiae deserunt doloribus quasi quidem.</p>
-        </article>
-        <article>
-            <h2>Facilis fugit reprehenderit libero!</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Quos temporibus numquam nobis atque odit suscipit amet voluptas deserunt nam expedita consequatur officia, nihil magni vero obcaecati accusantium assumenda. Illum quia deleniti voluptatum? Praesentium dicta recusandae enim quibusdam perferendis.</p>
-        </article>
-        <article>
-            <h2>Cumque laborum quam vitae!</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Sed esse quod similique quibusdam. Eligendi ullam provident, doloribus eius id perferendis non aut iure? Eaque consectetur rem, minus porro voluptatum necessitatibus, fugiat inventore saepe vel, quos sit ullam perferendis!</p>
-        </article>
-        <article>
-            <h2>Eos minus maxime esse.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Perferendis cum facere dolor natus harum expedita placeat assumenda vitae repellendus, omnis explicabo ad illo quibusdam sunt commodi ipsam voluptas quo eligendi alias! Necessitatibus facere vero aut ea, iusto nam.</p>
-        </article>
-        <article>
-            <h2>Dolores hic reprehenderit illum!</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Tempora at et incidunt, aut est soluta numquam quisquam, sed beatae dolor nobis dolorem. Magnam, fugiat atque incidunt ratione voluptatibus cum suscipit dolor voluptates a qui expedita vitae corporis sed!</p>
-        </article>
-        <article>
-            <h2>Similique sequi laborum iusto?</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Expedita iure eaque fugiat possimus eligendi odio facilis quam illum dolorum quisquam mollitia ratione inventore enim assumenda dolorem laudantium doloribus cupiditate blanditiis, placeat odit veritatis quas! Tenetur sint unde expedita.</p>
-        </article>
-        <article>
-            <h2>Aut temporibus nihil porro!</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Aut nostrum tempore molestias perspiciatis sapiente totam similique quisquam id aspernatur pariatur, laudantium omnis sed sequi quam. Sunt laborum perspiciatis, enim, rerum ipsam qui, voluptate magnam hic odit esse odio!</p>
-        </article>
-        <article>
-            <h2>Dolores accusantium optio ipsa.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Quisquam, consequuntur! Consectetur aspernatur nam nobis, praesentium mollitia omnis odit? Ad ipsam iste esse consectetur, libero ipsa itaque veritatis molestiae dolore deleniti nihil commodi fugiat distinctio iusto alias a quos!</p>
-        </article>
-        <article>
-            <h2>Rem dolorum eum aut.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Nisi dignissimos laudantium animi quia vero magni sed, est at aut ea nemo deserunt omnis quo nihil fugit veniam quam qui? Veritatis fugit voluptatum aperiam quo, voluptatem quas dolorem aliquid.</p>
-        </article>
-        <article>
-            <h2>Ex, consequatur. Voluptatum, repellendus.</h2>
-            <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-            <p>Incidunt voluptate laboriosam blanditiis iusto. Aspernatur accusamus quaerat nemo rem deleniti doloribus, molestias maxime nostrum eveniet, eos natus quae veritatis dolore sunt, dolores voluptate saepe unde sapiente numquam tempore porro.</p>
-        </article>
-    </div>
-
-    
-
-    
+    <h1>Projects (<span id="project-count"></span>)</h1>
+    <div class="projects"></div>
 
 </body>
 </html>

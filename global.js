@@ -112,25 +112,52 @@ form?.addEventListener('submit', (event) => {
 
 //lab4 java II
 
+console.log("Global.js 运行中...");
+
 export async function fetchJSON(url) {
-  try {
-      // Fetch the JSON file from the given URL
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch projects: ${response.statusText}`);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`获取项目数据失败: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("获取的数据:", data); // 确保 JSON 正确加载
+        return data;
+    } catch (error) {
+        console.error('获取或解析 JSON 数据时出错:', error);
+        return null; // 发生错误时返回 null
     }
-
-    const data = await response.json();
-    console.log("获取的数据:", data); // 打印获取的数据
-
-
-  // 返回解析后的数据
-  return data;
-} catch (error) {
-  console.error('获取或解析 JSON 数据时出错:', error);
-  return null; // 如果出错，返回 null
-  }
 }
 
-console.log(response)
+export function renderProjects(projects, containerElement, headingLevel = 'h2') {
+    if (!containerElement) {
+        console.error("找不到 .projects 容器");
+        return;
+    }
+
+    containerElement.innerHTML = ''; // 清空现有内容
+    projects.forEach(project => {
+        const article = document.createElement('article');
+        article.innerHTML = `
+            <${headingLevel}>${project.title}</${headingLevel}>
+            <img src="${project.image}" alt="${project.title}">
+            <p>${project.description}</p>
+        `;
+        containerElement.appendChild(article);
+    });
+}
+
+// 🔥 自动加载并渲染项目数据
+document.addEventListener("DOMContentLoaded", () => {
+    const projectsContainer = document.querySelector('.projects');
+    if (projectsContainer) {
+        fetchJSON('../project.json').then(projects => {
+            if (projects) {
+                renderProjects(projects, projectsContainer, 'h3');
+                document.querySelector('#project-count').textContent = projects.length;
+            } else {
+                console.error("项目数据加载失败");
+            }
+        });
+    }
+});
