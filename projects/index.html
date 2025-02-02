@@ -5,7 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects</title>
     <link rel="stylesheet" href="../style.css">
-    <script src="../global.js" type="module" defer></script>  
+    <script src="../global.js" type="module" defer></script> 
+    
+    <script type="module">
+        import { fetchJSON } from '../global.js';
+      
+        // 定义 JSON 文件的路径
+        const projectsURL = '../lib/projects.json'; // 根据需要调整路径
+      
+        // 获取项目数据
+        fetchJSON(projectsURL).then(projects => {
+          if (projects) {
+            // 获取项目的容器
+            const projectsContainer = document.querySelector('.projects');
+      
+            if (projectsContainer) {
+              // 清除现有内容
+              projectsContainer.innerHTML = '';
+      
+              // 遍历项目并创建 HTML 元素
+              projects.forEach(project => {
+                const article = document.createElement('article');
+                article.innerHTML = `
+                  <h2>${project.title}</h2>
+                  <img src="${project.image}" alt="${project.title}">
+                  <p>${project.description}</p>
+                `;
+                projectsContainer.appendChild(article);
+              });
+            }
+          }
+        });
+      </script>
     
 </head>
 <body>
