@@ -150,7 +150,7 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
 document.addEventListener("DOMContentLoaded", () => {
     const projectsContainer = document.querySelector('.projects');
     if (projectsContainer) {
-        fetchJSON('../lib/project.json').then(projects => {
+        fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
             if (projects) {
                 renderProjects(projects, projectsContainer, 'h3');
                 document.querySelector('#project-count').textContent = projects.length;
