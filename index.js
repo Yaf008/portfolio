@@ -1,4 +1,4 @@
-import { fetchJSON, renderProjects } from 'https://yaf008.github.io/portfolio/lib/project.json';
+import { fetchJSON, renderProjects } from './global.js';
 
 // 获取项目数据并筛选前 3 个
 document.addEventListener("DOMContentLoaded", async () => {
