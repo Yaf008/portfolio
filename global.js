@@ -151,7 +151,7 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
 document.addEventListener("DOMContentLoaded", () => {
     const projectsContainer = document.querySelector('.projects');
     if (projectsContainer) {
-        fetchJSON('../project.json').then(projects => {
+        fetchJSON('./lib/project.json').then(projects => {
             if (projects) {
                 renderProjects(projects, projectsContainer, 'h3');
                 document.querySelector('#project-count').textContent = projects.length;
