@@ -121,11 +121,11 @@ export async function fetchJSON(url) {
             throw new Error(`获取项目数据失败: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("获取的数据:", data); // 确保 JSON 正确加载
+        console.log("获取的数据:", data);
         return data;
     } catch (error) {
         console.error('获取或解析 JSON 数据时出错:', error);
-        return null; // 发生错误时返回 null
+        return null;
     }
 }
 
@@ -135,7 +135,7 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
         return;
     }
 
-    containerElement.innerHTML = ''; // 清空现有内容
+    containerElement.innerHTML = '';
     projects.forEach(project => {
         const article = document.createElement('article');
         article.innerHTML = `
@@ -147,11 +147,10 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     });
 }
 
-// 🔥 自动加载并渲染项目数据
 document.addEventListener("DOMContentLoaded", () => {
     const projectsContainer = document.querySelector('.projects');
     if (projectsContainer) {
-        fetchJSON('../lib/project.json').then(projects => {  // **使用 ../lib/project.json**
+        fetchJSON('../lib/project.json').then(projects => {
             if (projects) {
                 renderProjects(projects, projectsContainer, 'h3');
                 document.querySelector('#project-count').textContent = projects.length;
