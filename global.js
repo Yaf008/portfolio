@@ -144,14 +144,35 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
             <p>${project.description}</p>
         `;
 
+        // 创建标题
+        const titleElement = document.createElement(headingLevel);
+        titleElement.textContent = project.title;
+
+        // 创建图片
+        const imageElement = document.createElement('img');
+        imageElement.src = project.image;
+        imageElement.alt = project.title;
+
+        // 创建描述
+        const descriptionElement = document.createElement('p');
+        descriptionElement.textContent = project.description;
+
+        // 创建年份元素
         const yearElement = document.createElement('p');
         yearElement.textContent = project.year;
-        yearElement.classList.add('project-year'); 
+        yearElement.classList.add('project-year'); // 添加样式类
 
+        // 包装描述和年份
         const detailsWrapper = document.createElement('div');
         detailsWrapper.classList.add('project-details');
         detailsWrapper.appendChild(descriptionElement);
         detailsWrapper.appendChild(yearElement);
+
+        // 组合元素
+        article.appendChild(titleElement);
+        article.appendChild(imageElement);
+        article.appendChild(detailsWrapper);
+
         containerElement.appendChild(article);
     });
 }
