@@ -130,51 +130,46 @@ export async function fetchJSON(url) {
 }
 
 export function renderProjects(projects, containerElement, headingLevel = 'h2') {
-    if (!containerElement) {
-        console.error("The.projects container cannot be found");
-        return;
-    }
+  if (!containerElement) {
+    console.error("The .projects container cannot be found");
+    return;
+}
 
-    containerElement.innerHTML = '';
-    projects.forEach(project => {
-        const article = document.createElement('article');
-        article.innerHTML = `
-            <${headingLevel}>${project.title}</${headingLevel}>
-            <img src="${project.image}" alt="${project.title}">
-            <p>${project.description}</p>
-        `;
+containerElement.innerHTML = '';
+projects.forEach(project => {
+    const article = document.createElement('article');
 
-        // 创建标题
-        const titleElement = document.createElement(headingLevel);
-        titleElement.textContent = project.title;
+    // 创建标题
+    const titleElement = document.createElement(headingLevel);
+    titleElement.textContent = project.title;
 
-        // 创建图片
-        const imageElement = document.createElement('img');
-        imageElement.src = project.image;
-        imageElement.alt = project.title;
+    // 创建图片
+    const imageElement = document.createElement('img');
+    imageElement.src = project.image;
+    imageElement.alt = project.title;
 
-        // 创建描述
-        const descriptionElement = document.createElement('p');
-        descriptionElement.textContent = project.description;
+    // 创建描述
+    const descriptionElement = document.createElement('p');
+    descriptionElement.textContent = project.description;
 
-        // 创建年份元素
-        const yearElement = document.createElement('p');
-        yearElement.textContent = project.year;
-        yearElement.classList.add('project-year'); // 添加样式类
+    // 创建年份元素
+    const yearElement = document.createElement('p');
+    yearElement.textContent = project.year;
+    yearElement.classList.add('project-year'); // 添加样式类
 
-        // 包装描述和年份
-        const detailsWrapper = document.createElement('div');
-        detailsWrapper.classList.add('project-details');
-        detailsWrapper.appendChild(descriptionElement);
-        detailsWrapper.appendChild(yearElement);
+    // 包装描述和年份
+    const detailsWrapper = document.createElement('div');
+    detailsWrapper.classList.add('project-details');
+    detailsWrapper.appendChild(descriptionElement);
+    detailsWrapper.appendChild(yearElement);
 
-        // 组合元素
-        article.appendChild(titleElement);
-        article.appendChild(imageElement);
-        article.appendChild(detailsWrapper);
+    // 组合元素
+    article.appendChild(titleElement);
+    article.appendChild(imageElement);
+    article.appendChild(detailsWrapper);
 
-        containerElement.appendChild(article);
-    });
+    containerElement.appendChild(article);
+});
 }
 
 document.addEventListener("DOMContentLoaded", () => {
