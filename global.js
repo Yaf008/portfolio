@@ -205,4 +205,13 @@ export async function fetchGitHubData(username) {
 
 //lab5
 
+document.addEventListener("DOMContentLoaded", () => {
+  d3.select("#projects-pie-plot")
+    .append("circle")
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("r", 50)
+    .attr("fill", "red");
+});
+
 
