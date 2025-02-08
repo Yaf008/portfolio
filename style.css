@@ -126,3 +126,9 @@ nav a.current {
   font-variant-numeric: oldstyle-nums;
   font-size: 0.9em;
 }
+
+#projects-pie-plot {
+  max-width: 20em;
+  margin-block: 2em;
+  overflow: visible;
+}
