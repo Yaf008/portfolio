@@ -13,7 +13,7 @@ console.log("脚本仍在运行，pages 数组已定义");
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
-const REPO_NAME = location.pathname.split('/')[1] || ''; // 动态获取仓库名称
+const REPO_NAME = location.pathname.split('/')[1] || ''; // Get the warehouse name dynamically
 
 let links = [];
 
@@ -21,9 +21,9 @@ for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  // 修正路径问题
+  // Corrected path problem
   if (!url.startsWith('http')) {
-    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // 确保路径格式正确
+    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // Make sure the path format is correct
   }
   console.log("生成的 URL:", url);
 
@@ -33,20 +33,20 @@ for (let p of pages) {
   nav.append(a);
   links.push(a);
 
-  // 外部链接新窗口打开
+  // External links A new window opens
   if (a.host !== location.host) {
     a.target = '_blank';
   }
 }
 
-// 优化 current 类添加
+// Optimizes current class addition
 let currentLink = links.find(link => {
   let linkPath = new URL(link.href, location.origin).pathname.replace(/\/$/, '');
   let currentPath = location.pathname.replace(/\/$/, '');
   return linkPath === currentPath;
 });
 
-// 安全地添加 `current` 类
+// Securely add the 'current' class
 currentLink?.classList.add('current');
 
 console.log("脚本执行完毕");
@@ -112,26 +112,26 @@ form?.addEventListener('submit', (event) => {
 
 //lab4 java II
 
-console.log("Global.js 运行中...");
+console.log("Global.js loading...");
 
 export async function fetchJSON(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`获取项目数据失败: ${response.statusText}`);
+            throw new Error(`Failed to obtain project data: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("获取的数据:", data);
+        console.log("Acquired data:", data);
         return data;
     } catch (error) {
-        console.error('获取或解析 JSON 数据时出错:', error);
+        console.error('Error obtaining or parsing JSON data:', error);
         return null;
     }
 }
 
 export function renderProjects(projects, containerElement, headingLevel = 'h2') {
     if (!containerElement) {
-        console.error("找不到 .projects 容器");
+        console.error("The.projects container cannot be found");
         return;
     }
 
@@ -143,6 +143,15 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
             <img src="${project.image}" alt="${project.title}">
             <p>${project.description}</p>
         `;
+
+        const yearElement = document.createElement('p');
+        yearElement.textContent = project.year;
+        yearElement.classList.add('project-year'); 
+
+        const detailsWrapper = document.createElement('div');
+        detailsWrapper.classList.add('project-details');
+        detailsWrapper.appendChild(descriptionElement);
+        detailsWrapper.appendChild(yearElement);
         containerElement.appendChild(article);
     });
 }
@@ -155,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderProjects(projects, projectsContainer, 'h3');
                 document.querySelector('#project-count').textContent = projects.length;
             } else {
-                console.error("项目数据加载失败");
+                console.error("Failed to load project data");
             }
         });
     }
@@ -167,13 +176,17 @@ export async function fetchGitHubData(username) {
   try {
       const response = await fetch(`https://api.github.com/users/${username}`);
       if (!response.ok) {
-          throw new Error(`GitHub API 请求失败: ${response.statusText}`);
+          throw new Error(`The GitHub API request failed: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("GitHub 数据:", data);  // 调试信息
+      console.log("GitHub data:", data);  // 调试信息
       return data;
   } catch (error) {
-      console.error('获取 GitHub 数据时出错:', error);
+      console.error('Error getting GitHub data:', error);
       return null;
   }
 }
+
+//lab5
+
+

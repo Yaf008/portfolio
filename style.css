@@ -119,3 +119,10 @@ nav a.current {
   margin: 0;
   text-align: left;
 }
+
+.project-year {
+  color: gray;
+  font-family: Baskerville, serif;
+  font-variant-numeric: oldstyle-nums;
+  font-size: 0.9em;
+}
