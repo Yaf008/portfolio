@@ -246,7 +246,7 @@ let arcs = arcData.map((d) => arcGenerator(d));
 
 let colors = ['gold', 'purple'];
 
-arcs.forEach((arc, idx) => {
+arcs.forEach((arc, i) => {
   d3.select('svg')
     .append('path')
     .attr('d', arc)
