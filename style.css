@@ -162,35 +162,6 @@ nav a.current {
   min-width: 200px;
 }
 
-/* 大屏幕：三列两行，图例在饼图右侧 */
-@media (min-width: 800px) {
-  .container {
-    flex-direction: row;
-  }
-  .legend {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* 中等屏幕：两列三行，图例在饼图右侧 */
-@media (min-width: 500px) and (max-width: 799px) {
-  .container {
-    flex-direction: row;
-  }
-  .legend {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* 小屏幕：一列六行，图例在饼图下方 */
-@media (max-width: 499px) {
-  .container {
-    flex-direction: column;
-  }
-  .legend {
-    grid-template-columns: 1fr;
-  }
-}
 
 .legend li {
   display: flex;
