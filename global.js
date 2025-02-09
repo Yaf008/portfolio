@@ -244,41 +244,6 @@ function drawPieChart(data) {
 
   svg.selectAll("*").remove(); 
 
-  svg.selectAll('path')
-    .data(arcData)
-    .enter()
-    .append('path')
-    .attr('d', arcGenerator)
-    .attr('fill', (d, i) => colors(i))
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1);
-
-  let legend = d3.select('.legend');
-  legend.selectAll('*').remove();
-  data.forEach((d, idx) => {
-    legend.append('li')
-          .attr('class', 'legend-item')
-          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
-  });
-}
-
-
-let selectedIndex = -1; // 用于跟踪选中的楔形索引
-
-function drawPieChart(data) {
-  let pie = d3.pie().value(d => d.value);
-  let arcData = pie(data);
-  let radius = 80;
-  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
-  let colors = d3.scaleOrdinal(d3.schemeTableau10);
-
-  let svg = d3.select('.pie-chart')
-              .attr("width", 300)  
-              .attr("height", 300)
-              .attr("viewBox", "-100 -100 200 200");
-
-  svg.selectAll("*").remove(); 
-
   // 绘制饼图楔形
   svg.selectAll('path')
     .data(arcData)
