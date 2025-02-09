@@ -13,7 +13,7 @@ console.log("脚本仍在运行，pages 数组已定义");
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
-const REPO_NAME = location.pathname.split('/')[1] || ''; // Get the warehouse name dynamically
+const REPO_NAME = location.pathname.split('/')[1] || ''; // 动态获取仓库名称
 
 let links = [];
 
@@ -21,9 +21,9 @@ for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  // Corrected path problem
+  // 修正路径问题
   if (!url.startsWith('http')) {
-    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // Make sure the path format is correct
+    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // 确保路径格式正确
   }
   console.log("生成的 URL:", url);
 
@@ -33,24 +33,25 @@ for (let p of pages) {
   nav.append(a);
   links.push(a);
 
-  // External links A new window opens
+  // 外部链接在新窗口中打开
   if (a.host !== location.host) {
     a.target = '_blank';
   }
 }
 
-// Optimizes current class addition
+// 优化当前类添加
 let currentLink = links.find(link => {
   let linkPath = new URL(link.href, location.origin).pathname.replace(/\/$/, '');
   let currentPath = location.pathname.replace(/\/$/, '');
   return linkPath === currentPath;
 });
 
-// Securely add the 'current' class
+// 安全地添加 'current' 类
 currentLink?.classList.add('current');
 
 console.log("脚本执行完毕");
 
+// 颜色主题切换
 document.body.insertAdjacentHTML(
   'afterbegin',
   `
@@ -80,41 +81,43 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-const form = document.querySelector('#contact-form');
+// 项目过滤和饼图交互
+let selectedIndex = -1; // 初始化为-1，表示没有选中任何楔形
+let projects = []; // 存储项目数据
 
-form?.addEventListener('submit', (event) => {
-    event.preventDefault(); 
-
-    const data = new FormData(form);
-    const mailto = form.action;
-    const params = [];
-
-    for (let [name, value] of data) {
-        params.push(`${name}=${encodeURIComponent(value)}`);
-    }
-
-    const url = `${mailto}?${params.join('&')}`;
-
-    location.href = url;
+document.addEventListener("DOMContentLoaded", () => {
+  const projectsContainer = document.querySelector('.projects');
+  if (projectsContainer) {
+    fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
+      if (data) {
+        projects = data;
+        renderProjects(projects, projectsContainer, 'h3');
+        document.querySelector('#project-count').textContent = projects.length;
+        renderPieChart(projects);
+      } else {
+        console.error("Failed to load project data");
+      }
+    });
+  }
 });
 
-console.log("Global.js loading...");
-
+// 获取 JSON 数据
 export async function fetchJSON(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to obtain project data: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("Acquired data:", data);
-        return data;
-    } catch (error) {
-        console.error('Error obtaining or parsing JSON data:', error);
-        return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to obtain project data: ${response.statusText}`);
     }
+    const data = await response.json();
+    console.log("Acquired data:", data);
+    return data;
+  } catch (error) {
+    console.error('Error obtaining or parsing JSON data:', error);
+    return null;
+  }
 }
 
+// 渲染项目列表
 export function renderProjects(projects, containerElement, headingLevel = 'h2') {
   if (!containerElement) {
     console.error("The .projects container cannot be found");
@@ -125,31 +128,31 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
   projects.forEach(project => {
     const article = document.createElement('article');
 
-    // Create a title
+    // 创建标题
     const titleElement = document.createElement(headingLevel);
     titleElement.textContent = project.title;
 
-    // Create an image
+    // 创建图片
     const imageElement = document.createElement('img');
     imageElement.src = project.image;
     imageElement.alt = project.title;
 
-    // Create a description
+    // 创建描述
     const descriptionElement = document.createElement('p');
     descriptionElement.textContent = project.description;
 
-    // Create the year element
+    // 创建年份元素
     const yearElement = document.createElement('p');
     yearElement.textContent = project.year;
     yearElement.classList.add('project-year');
 
-    // Package description and year
+    // 包装描述和年份
     const detailsWrapper = document.createElement('div');
     detailsWrapper.classList.add('project-details');
     detailsWrapper.appendChild(descriptionElement);
     detailsWrapper.appendChild(yearElement);
 
-    // Combine elements
+    // 组合元素
     article.appendChild(titleElement);
     article.appendChild(imageElement);
     article.appendChild(detailsWrapper);
@@ -158,66 +161,7 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
   });
 }
 
-let projects = []; 
-let query = '';
-
-document.addEventListener("DOMContentLoaded", () => {
-  const projectsContainer = document.querySelector('.projects');
-  if (projectsContainer) {
-    fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
-      if (data) {
-        projects = data; // 初始化项目数据
-        renderProjects(projects, projectsContainer, 'h3');
-        document.querySelector('#project-count').textContent = projects.length;
-
-        // 初始化饼图
-        if (projects.length > 0) {
-          renderPieChart(projects);
-        }
-      } else {
-        console.error("Failed to load project data");
-      }
-    });
-  }
-
-  // 搜索功能
-  let searchInput = document.querySelector('.searchBar');
-  searchInput.addEventListener('input', (event) => {
-    query = event.target.value.toLowerCase();
-    let filteredProjects = projects.filter((project) => 
-      project.title.toLowerCase().includes(query)
-    );
-    renderProjects(filteredProjects, projectsContainer, 'h3');
-    document.querySelector('#project-count').textContent = filteredProjects.length;
-
-    // 更新饼图
-    if (filteredProjects.length > 0) {
-      renderPieChart(filteredProjects);
-    } else {
-      console.error("❌ 没有匹配的项目！");
-    }
-  });
-});
-
-// GitHub 数据
-export async function fetchGitHubData(username) {
-  try {
-      const response = await fetch(`https://api.github.com/users/${username}`);
-      if (!response.ok) {
-          throw new Error(`The GitHub API request failed: ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log("GitHub data:", data);
-      return data;
-  } catch (error) {
-      console.error('Error getting GitHub data:', error);
-      return null;
-  }
-}
-
-// D3.js 饼图
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
-
+// 渲染饼图
 function renderPieChart(filteredProjects) {
   let rolledData = d3.rollups(
     filteredProjects,
@@ -230,6 +174,7 @@ function renderPieChart(filteredProjects) {
   drawPieChart(data);
 }
 
+// 绘制饼图
 function drawPieChart(data) {
   let pie = d3.pie().value(d => d.value);
   let arcData = pie(data);
@@ -238,13 +183,12 @@ function drawPieChart(data) {
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
   let svg = d3.select('.pie-chart')
-              .attr("width", 300)  
+              .attr("width", 300)
               .attr("height", 300)
               .attr("viewBox", "-100 -100 200 200");
 
-  svg.selectAll("*").remove(); 
+  svg.selectAll("*").remove();
 
-  // 绘制饼图楔形
   svg.selectAll('path')
     .data(arcData)
     .enter()
@@ -253,12 +197,11 @@ function drawPieChart(data) {
     .attr('fill', (d, i) => colors(i))
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
-    .on('click', (event, d) => {
-      selectedIndex = selectedIndex === d.index ? -1 : d.index; // 切换选中状态
-      updateChartAndProjects(data, selectedIndex); // 更新图表和项目
+    .on('click', (event, d, i) => {
+      selectedIndex = selectedIndex === i ? -1 : i; // 切换选中状态
+      updateSelection();
     });
 
-  // 绘制图例
   let legend = d3.select('.legend');
   legend.selectAll('*').remove();
   data.forEach((d, idx) => {
@@ -267,30 +210,40 @@ function drawPieChart(data) {
           .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`)
           .on('click', () => {
             selectedIndex = selectedIndex === idx ? -1 : idx; // 切换选中状态
-            updateChartAndProjects(data, selectedIndex); // 更新图表和项目
+            updateSelection();
           });
   });
+
+  function updateSelection() {
+    svg.selectAll('path')
+      .attr('class', (_, idx) => (idx === selectedIndex ? 'selected' : ''));
+
+    legend.selectAll('.legend-item')
+      .attr('class', (_, idx) => (idx === selectedIndex ? 'legend-item selected' : 'legend-item'));
+
+    filterProjects();
+  }
 }
 
-function updateChartAndProjects(data, selectedIndex) {
-  const svg = d3.select('.pie-chart');
-  const legend = d3.select('.legend');
+// 根据选中的年份过滤项目
+function filterProjects() {
+  let filteredProjects = selectedIndex === -1 ? projects : projects.filter(project => String(project.year) === data[selectedIndex].label);
+  renderProjects(filteredProjects, document.querySelector('.projects'), 'h3');
+  document.querySelector('#project-count').textContent = filteredProjects.length;
+}
 
-  // 更新饼图选中状态
-  svg.selectAll('path')
-     .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
-
-  // 更新图例选中状态
-  legend.selectAll('.legend-item')
-        .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
-
-  // 根据选中的年份过滤项目
-  const projectsContainer = document.querySelector('.projects');
-  if (selectedIndex === -1) {
-    renderProjects(projects, projectsContainer, 'h3'); // 显示所有项目
-  } else {
-    const selectedYear = data[selectedIndex].label; // 获取选中的年份
-    const filteredProjects = projects.filter(project => String(project.year) === selectedYear); // 过滤项目
-    renderProjects(filteredProjects, projectsContainer, 'h3'); // 显示过滤后的项目
+// GitHub 数据获取
+export async function fetchGitHubData(username) {
+  try {
+    const response = await fetch(`https://api.github.com/users/${username}`);
+    if (!response.ok) {
+      throw new Error(`The GitHub API request failed: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("GitHub data:", data);  // 调试信息
+    return data;
+  } catch (error) {
+    console.error('Error getting GitHub data:', error);
+    return null;
   }
 }
