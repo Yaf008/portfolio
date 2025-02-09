@@ -135,17 +135,17 @@ nav a.current {
 
 
 .container {
-  display: flex;              /* 让饼图和图例并排 */
-  align-items: center;        /* 让它们垂直居中 */
-  justify-content: flex-start; /* 左对齐 */
-  gap: 20px;                  /* 设置饼图和图例的间距 */
-  flex-wrap: wrap;            /* 小屏幕时自动换行 */
-  max-width: 600px;           /* 限制最大宽度 */
-  margin: auto;               /* 让容器居中 */
+  display: flex;
+  align-items: center;  /* 让饼图和图例垂直居中 */
+  justify-content: center; /* 默认居中 */
+  flex-wrap: wrap;  /* 小屏幕时换行 */
+  gap: 20px;
+  max-width: 600px;
+  margin: auto;
 }
 
 .pie-chart {
-  max-width: 250px;  /* 限制饼图大小 */
+  max-width: 250px; /* 限制饼图大小 */
   width: 100%;
   height: auto;
   display: block;
@@ -155,12 +155,35 @@ nav a.current {
   list-style: none;
   padding: 10px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(100px, 1fr)); /* 2列排列 */
   gap: 8px;
-  border: 1px solid #ccc;  /* 添加边框 */
+  border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
   min-width: 200px;
+}
+
+/* 大屏幕时 3 列 2 行 */
+@media (min-width: 800px) {
+  .legend {
+    grid-template-columns: repeat(3, minmax(100px, 1fr)); /* 3 列 */
+  }
+}
+
+/* 中等屏幕时 2 列 3 行 */
+@media (max-width: 799px) and (min-width: 500px) {
+  .legend {
+    grid-template-columns: repeat(2, minmax(100px, 1fr)); /* 2 列 */
+  }
+}
+
+/* 小屏幕时 1 列 6 行 */
+@media (max-width: 499px) {
+  .container {
+    flex-direction: column;  /* 让饼图和图例上下排列 */
+  }
+  .legend {
+    grid-template-columns: 1fr;  /* 1 列 */
+  }
 }
 
 .legend li {
