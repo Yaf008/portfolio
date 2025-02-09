@@ -276,21 +276,28 @@ function updateChartAndProjects(data, selectedIndex) {
   const svg = d3.select('.pie-chart');
   const legend = d3.select('.legend');
 
-  
+  // 更新选中的楔形
   svg.selectAll('path')
      .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
 
-
+  // 更新选中的图例项
   legend.selectAll('.legend-item')
         .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
 
-  
+  // 获取项目容器
   const projectsContainer = document.querySelector('.projects');
+
   if (selectedIndex === -1) {
+    // 取消筛选，显示所有项目
     renderProjects(projects, projectsContainer, 'h3'); 
   } else {
+    // 获取选中的年份
     const selectedYear = data[selectedIndex].label;
-    const filteredProjects = projects.filter(project => String(project.year) === selectedYear); // 过滤项目
+
+    // 根据年份筛选项目
+    const filteredProjects = projects.filter(project => String(project.year) === selectedYear);
+
+    // 渲染筛选后的项目
     renderProjects(filteredProjects, projectsContainer, 'h3'); 
   }
 }
