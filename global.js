@@ -289,12 +289,12 @@ function drawPieChart(data) {
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
   let svg = d3.select('.pie-chart')
-              .attr("width", 200)  // ✅ 确保是圆形
-              .attr("height", 200)
-              .attr("viewBox", "-100 -100 200 200") // ✅ 让中心点 (0,0)
+              .attr("width", 400)  
+              .attr("height", 400)
+              .attr("viewBox", "-100 -100 200 200") 
 
-              
-  svg.selectAll("*").remove();  // ✅ 清空旧饼图
+
+  svg.selectAll("*").remove(); 
 
   svg.selectAll('path')
     .data(arcData)
