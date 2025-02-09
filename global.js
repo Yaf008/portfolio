@@ -269,11 +269,11 @@ fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects =
 });
 
 
-function renderPieChart(projects) {
+function renderPieChart(filteredProjects) {
   let rolledData = d3.rollups(
-    projects,
+    filteredProjects,
     (v) => v.length,
-    (d) => String(d.year)  
+    (d) => String(d.year)  // 确保 `year` 是字符串
   );
 
   let data = rolledData.map(([year, count]) => ({ value: count, label: year }));
@@ -328,8 +328,18 @@ function filterProjects() {
     String(project.year).includes(query)
   );
 
-  console.log("🔍 过滤后的项目:", filteredProjects);
+  console.log("🔍 Filtered items:", filteredProjects);
   
   renderProjects(filteredProjects, document.querySelector('.projectsContainer'), 'h3');  // 更新项目列表
   renderPieChart(filteredProjects);  // ✅ 重新渲染饼图，确保数据可视化也更新
 }
+
+
+fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
+  if (data && data.length > 0) {
+    projects = data;  // ✅ 存储项目数据
+    filterProjects();  // ✅ 立即渲染项目和饼图
+  } else {
+    console.error("❌ Failed to load project data");
+  }
+});
