@@ -253,10 +253,12 @@ function drawPieChart(data) {
     .attr('fill', (d, i) => colors(i))
     .attr('stroke', 'white')
     .attr('stroke-width', 1)
-    .on('click', (event, d) => {
-      selectedIndex = selectedIndex === d.index ? -1 : d.index; // 切换选中状态
-      updateChartAndProjects(data, selectedIndex); // 更新图表和项目
+    .on('click', function(event, d) {
+        let clickedIndex = arcData.findIndex(a => a === d);
+        selectedIndex = (selectedIndex === clickedIndex) ? -1 : clickedIndex; // 切换选中状态
+        updateChartAndProjects(data, selectedIndex);
     });
+  
 
   // 绘制图例
   let legend = d3.select('.legend');
@@ -273,32 +275,29 @@ function drawPieChart(data) {
 }
 
 function updateChartAndProjects(data, selectedIndex) {
+  console.log("Selected index:", selectedIndex); // 查看选中的索引
   const svg = d3.select('.pie-chart');
   const legend = d3.select('.legend');
 
-  // 更新选中的楔形
   svg.selectAll('path')
-     .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
+      .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
 
-  // 更新选中的图例项
   legend.selectAll('.legend-item')
-        .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
+      .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
 
-  // 获取项目容器
   const projectsContainer = document.querySelector('.projects');
 
   if (selectedIndex === -1) {
-    // 取消筛选，显示所有项目
-    renderProjects(projects, projectsContainer, 'h3'); 
+      console.log("No filter applied. Showing all projects.");
+      renderProjects(projects, projectsContainer, 'h3');
   } else {
-    // 获取选中的年份
-    const selectedYear = data[selectedIndex].label;
+      const selectedYear = data[selectedIndex]?.label;
+      console.log("Filtering for year:", selectedYear); // 调试年份
 
-    // 根据年份筛选项目
-    const filteredProjects = projects.filter(project => String(project.year) === selectedYear);
+      const filteredProjects = projects.filter(project => String(project.year) === selectedYear);
+      console.log("Filtered projects:", filteredProjects); // 查看过滤后的项目
 
-    // 渲染筛选后的项目
-    renderProjects(filteredProjects, projectsContainer, 'h3'); 
+      renderProjects(filteredProjects, projectsContainer, 'h3');
   }
 }
 
