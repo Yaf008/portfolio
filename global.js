@@ -166,11 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (projectsContainer) {
     fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
       if (data) {
-        projects = data; // 初始化项目数据
+        projects = data; 
         renderProjects(projects, projectsContainer, 'h3');
         document.querySelector('#project-count').textContent = projects.length;
 
-        // 初始化饼图
+        
         if (projects.length > 0) {
           renderPieChart(projects);
         }
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 搜索功能
+ 
   let searchInput = document.querySelector('.searchBar');
   searchInput.addEventListener('input', (event) => {
     query = event.target.value.toLowerCase();
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProjects(filteredProjects, projectsContainer, 'h3');
     document.querySelector('#project-count').textContent = filteredProjects.length;
 
-    // 更新饼图
+    
     if (filteredProjects.length > 0) {
       renderPieChart(filteredProjects);
     } else {
@@ -222,7 +222,7 @@ function renderPieChart(filteredProjects) {
   let rolledData = d3.rollups(
     filteredProjects,
     (v) => v.length,
-    (d) => String(d.year)  // 确保 `year` 是字符串
+    (d) => String(d.year)  
   );
 
   let data = rolledData.map(([year, count]) => ({ value: count, label: year }));
@@ -276,21 +276,25 @@ function updateChartAndProjects(data, selectedIndex) {
   const svg = d3.select('.pie-chart');
   const legend = d3.select('.legend');
 
-  // 更新饼图选中状态
+  
   svg.selectAll('path')
      .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
 
-  // 更新图例选中状态
+
   legend.selectAll('.legend-item')
         .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
 
-  // 根据选中的年份过滤项目
+  
   const projectsContainer = document.querySelector('.projects');
   if (selectedIndex === -1) {
-    renderProjects(projects, projectsContainer, 'h3'); // 显示所有项目
+    renderProjects(projects, projectsContainer, 'h3'); 
   } else {
-    const selectedYear = data[selectedIndex].label; // 获取选中的年份
+    const selectedYear = data[selectedIndex].label;
     const filteredProjects = projects.filter(project => String(project.year) === selectedYear); // 过滤项目
-    renderProjects(filteredProjects, projectsContainer, 'h3'); // 显示过滤后的项目
+    renderProjects(filteredProjects, projectsContainer, 'h3'); 
   }
 }
+
+
+
+
