@@ -216,32 +216,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-document.addEventListener("DOMContentLoaded", () => {
-  let data = [1, 2];  // 33% 和 66% 切片
-  let colors = ["gold", "purple"];  // 颜色
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
-  let total = data.reduce((acc, val) => acc + val, 0);
-
-  let angle = 0;
-  let arcData = [];
-
-  for (let d of data) {
-      let endAngle = angle + (d / total) * 2 * Math.PI;
-      arcData.push({ startAngle: angle, endAngle });
-      angle = endAngle;
-  }
-
-  let arcGenerator = d3.arc()
-      .innerRadius(0)  // 饼图（实心）
-      .outerRadius(50);
-
-  let arcs = arcData.map((d) => arcGenerator(d));
-
-  let svg = d3.select("#projects-pie-plot");
-
-  arcs.forEach((arc, idx) => {
-      svg.append("path")
-         .attr("d", arc)
-         .attr("fill", colors[idx]); // 颜色区分
-  });
+let arc = arcGenerator({
+  startAngle: 0,
+  endAngle: 2 * Math.PI,
 });
+
+d3.select('svg').append('path').attr('d', arc).attr('fill', 'red');
+
