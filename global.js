@@ -219,81 +219,44 @@ document.addEventListener("DOMContentLoaded", () => {
 // 📌 1. 获取项目数据并渲染饼图
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-// 📌 1. 获取项目数据并渲染饼图
-fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
-  if (projects && projects.length > 0) {  
-    console.log("✅ Successfully fetched project data:", projects);
-    renderPieChart(projects);
-  } else {
-    console.error("❌ Failed to load project data or no projects available!");
-  }
+
+let data = [
+  { value: 1, label: 'apples' },
+  { value: 2, label: 'oranges' },
+  { value: 3, label: 'mangos' },
+  { value: 4, label: 'pears' },
+  { value: 5, label: 'limes' },
+  { value: 5, label: 'cherries' },
+];
+
+// 1. 生成饼图数据
+let pie = d3.pie().value(d => d.value);
+let arcData = pie(data);
+
+// 2. 设置饼图半径
+let radius = 80; // 修改为80px 让它更接近你的截图
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+
+// 3. 颜色映射
+let colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+// 4. 选择 SVG 并绑定数据
+let svg = d3.select('.pie-chart');
+
+svg.selectAll('path')
+  .data(arcData) // 绑定数据
+  .enter()
+  .append('path') // 创建 path
+  .attr('d', arcGenerator) // 生成路径
+  .attr('fill', (d, i) => colors(i)) // 按索引填充颜色
+  .attr('stroke', 'white')
+  .attr('stroke-width', 1);
+
+// 5. 创建图例
+let legend = d3.select('.legend');
+
+data.forEach((d, idx) => {
+  legend.append('li')
+        .attr('class', 'legend-item')
+        .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
 });
-
-// 📌 2. 按年份统计项目数并转换为饼图数据
-function renderPieChart(projects) {
-  console.log("📌 Received projects data:", projects);
-
-  let rolledData = d3.rollups(
-    projects,
-    (v) => v.length,
-    (d) => String(d.year)  // ✅ 确保 year 是字符串
-  );
-
-  console.log("📌 Rolled data:", rolledData);
-
-  let data = rolledData.map(([year, count]) => {
-    return { value: count, label: year };
-  });
-
-  console.log("📌 Final data for pie chart:", data);
-  drawPieChart(data);
-}
-
-// 📌 3. 绘制饼图
-function drawPieChart(data) {
-  console.log("📊 Drawing pie chart with data:", data);
-
-  let pie = d3.pie().value(d => d.value);
-  let arcData = pie(data);
-  let radius = 80;
-  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
-  let colors = d3.scaleOrdinal(d3.schemeTableau10);
-
-  let svg = d3.select('.pie-chart');
-  svg.selectAll("*").remove();  
-
-  svg.selectAll('path')
-    .data(arcData)
-    .enter()
-    .append('path')
-    .attr('d', arcGenerator)
-    .attr('fill', (d, i) => colors(i))
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1);
-
-  let legend = d3.select('.legend');
-  legend.selectAll('*').remove();
-  data.forEach((d, idx) => {
-    legend.append('li')
-          .attr('class', 'legend-item')
-          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
-  });
-
-  console.log("✅ Pie chart drawn successfully!");
-}
-
-// 📌 4. 确保 `fetchJSON()` 存在
-async function fetchJSON(url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`❌ Failed to fetch project data: ${response.statusText}`);
-    }
-    const data = await response.json();
-    console.log("📌 JSON data fetched:", data);
-    return data;
-  } catch (error) {
-    console.error('❌ Error fetching or parsing JSON data:', error);
-    return [];
-  }
-}
