@@ -136,16 +136,16 @@ nav a.current {
 
 .container {
   display: flex;
-  align-items: center;  /* 让饼图和图例垂直居中 */
-  justify-content: center; /* 默认居中 */
-  flex-wrap: wrap;  /* 小屏幕时换行 */
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 20px;
   max-width: 600px;
   margin: auto;
 }
 
 .pie-chart {
-  max-width: 250px; /* 限制饼图大小 */
+  max-width: 250px;
   width: 100%;
   height: auto;
   display: block;
@@ -162,27 +162,33 @@ nav a.current {
   min-width: 200px;
 }
 
-/* 大屏幕时 3 列 2 行 */
+/* 大屏幕：三列两行，图例在饼图右侧 */
 @media (min-width: 800px) {
+  .container {
+    flex-direction: row;
+  }
   .legend {
-    grid-template-columns: repeat(3, minmax(100px, 1fr)); /* 3 列 */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* 中等屏幕时 2 列 3 行 */
-@media (max-width: 799px) and (min-width: 500px) {
+/* 中等屏幕：两列三行，图例在饼图右侧 */
+@media (min-width: 500px) and (max-width: 799px) {
+  .container {
+    flex-direction: row;
+  }
   .legend {
-    grid-template-columns: repeat(2, minmax(100px, 1fr)); /* 2 列 */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* 小屏幕时 1 列 6 行 */
+/* 小屏幕：一列六行，图例在饼图下方 */
 @media (max-width: 499px) {
   .container {
-    flex-direction: column;  /* 让饼图和图例上下排列 */
+    flex-direction: column;
   }
   .legend {
-    grid-template-columns: 1fr;  /* 1 列 */
+    grid-template-columns: 1fr;
   }
 }
 
