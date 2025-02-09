@@ -255,3 +255,52 @@ data.forEach((d, idx) => {
         .attr('class', 'legend-item')
         .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
 });
+
+
+function renderPieChart(projects) {
+  // 1. 使用 d3.rollups() 按年份汇总项目数
+  let rolledData = d3.rollups(
+    projects,
+    (v) => v.length,
+    (d) => d.year
+  );
+
+  // 2. 转换数据格式，使其适用于 D3
+  let data = rolledData.map(([year, count]) => {
+    return { value: count, label: year };
+  });
+
+  // 3. 生成饼图
+  drawPieChart(data);
+}
+
+function drawPieChart(data) {
+  let pie = d3.pie().value(d => d.value);
+  let arcData = pie(data);
+  let radius = 80;
+  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+  let colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+  // 清除旧图表
+  let svg = d3.select('.pie-chart');
+  svg.selectAll('*').remove();
+
+  // 绑定数据并创建路径
+  svg.selectAll('path')
+    .data(arcData)
+    .enter()
+    .append('path')
+    .attr('d', arcGenerator)
+    .attr('fill', (d, i) => colors(i))
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1);
+
+  // 更新图例
+  let legend = d3.select('.legend');
+  legend.selectAll('*').remove();
+  data.forEach((d, idx) => {
+    legend.append('li')
+          .attr('class', 'legend-item')
+          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
+  });
+}
