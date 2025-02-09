@@ -261,39 +261,27 @@ data.forEach((d, idx) => {
 
 
 fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
-  if (projects && projects.length > 0) {  
-    console.log("✅ 获取到的项目数据:", projects);
-    
-    // ✅ 传递 `projects` 数据到 renderPieChart()
-    renderPieChart(projects);
+  if (projects && projects.length > 0) {
+    renderPieChart(projects);  // ✅ 这里调用 renderPieChart 生成饼图
   } else {
-    console.error("❌ 未能加载项目数据，或数据为空！");
+    console.error("❌ 项目数据为空！");
   }
 });
 
-function renderPieChart(projects) {
-  console.log("📌 接收到的项目数据:", projects);
 
+function renderPieChart(projects) {
   let rolledData = d3.rollups(
     projects,
-    (v) => v.length,  // 计算每年有多少个项目
-    (d) => String(d.year) // 确保 `year` 是字符串
+    (v) => v.length,
+    (d) => String(d.year)  // 确保 `year` 是字符串
   );
 
-  console.log("📌 按年份分组后的数据:", rolledData);
+  let data = rolledData.map(([year, count]) => ({ value: count, label: year }));
 
-  let data = rolledData.map(([year, count]) => {
-    return { value: count, label: year };
-  });
-
-  console.log("📌 最终传递给饼图的数据:", data);
   drawPieChart(data);
 }
 
-
 function drawPieChart(data) {
-  console.log("📊 开始绘制饼图，数据:", data);
-
   let pie = d3.pie().value(d => d.value);
   let arcData = pie(data);
   let radius = 80;
@@ -301,7 +289,7 @@ function drawPieChart(data) {
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
   let svg = d3.select('.pie-chart');
-  svg.selectAll("*").remove();  // 清空旧的饼图
+  svg.selectAll("*").remove();  // ✅ 清空旧饼图
 
   svg.selectAll('path')
     .data(arcData)
@@ -319,20 +307,4 @@ function drawPieChart(data) {
           .attr('class', 'legend-item')
           .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
   });
-
-  console.log("✅ 饼图绘制完成！");
-}
-export async function fetchJSON(url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`❌ 获取 JSON 数据失败: ${response.statusText}`);
-    }
-    const data = await response.json();
-    console.log("📌 成功获取 JSON 数据:", data);
-    return data;
-  } catch (error) {
-    console.error('❌ 获取 JSON 数据时出错:', error);
-    return [];
-  }
 }
