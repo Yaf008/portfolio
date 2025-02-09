@@ -284,12 +284,18 @@ function renderPieChart(projects) {
 function drawPieChart(data) {
   let pie = d3.pie().value(d => d.value);
   let arcData = pie(data);
-  let radius = 80;
+
+  let radius = 80; // ✅ 让饼图半径为 80
   let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-  let svg = d3.select('.pie-chart');
-  svg.selectAll("*").remove();  // ✅ 清空旧饼图
+  let svg = d3.select('.pie-chart')
+              .attr("width", 200)  // ✅ 确保是圆形
+              .attr("height", 200)
+              .attr("viewBox", "-100 -100 200 200") // ✅ 让中心点 (0,0)
+
+  svg.selectAll("*").remove(); // ✅ 清空旧的饼图
 
   svg.selectAll('path')
     .data(arcData)
@@ -299,12 +305,4 @@ function drawPieChart(data) {
     .attr('fill', (d, i) => colors(i))
     .attr('stroke', 'white')
     .attr('stroke-width', 1);
-
-  let legend = d3.select('.legend');
-  legend.selectAll('*').remove();
-  data.forEach((d, idx) => {
-    legend.append('li')
-          .attr('class', 'legend-item')
-          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
-  });
 }

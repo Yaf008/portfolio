@@ -145,10 +145,9 @@ nav a.current {
 }
 
 .pie-chart {
-  max-width: 250px;
-  width: 100%;
-  height: auto;
   display: block;
+  max-width: 200px;
+  max-height: 200px;
 }
 
 .legend {
