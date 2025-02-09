@@ -156,3 +156,45 @@ nav a.current {
   border-radius: 50%;
   border: 1px solid #000;
 }
+
+/* 让图例变成网格布局 */
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr)); /* 自适应列数 */
+  gap: 10px; /* 让网格中的元素间隔合理 */
+  list-style: none;
+  padding: 10px;
+  margin: 20px auto;
+  max-width: 500px;
+  border: 1px solid #ccc; /* 给图例添加边框 */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* 让单个图例项的布局更美观 */
+.legend li {
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  gap: 8px; /* 颜色示例和文本之间的间隔 */
+  font-size: 14px;
+  padding: 5px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
+  transition: transform 0.2s ease-in-out;
+}
+
+/* 悬停效果，微微放大 */
+.legend li:hover {
+  transform: scale(1.05);
+}
+
+/* 让 swatch 变成圆形颜色块 */
+.legend .swatch {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  aspect-ratio: 1 / 1; /* 保持正方形 */
+  border-radius: 50%; /* 变成圆形 */
+  border: 1px solid #000;
+}
