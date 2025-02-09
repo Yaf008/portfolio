@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-llet arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
 let arc = arcGenerator({
   startAngle: 0,
