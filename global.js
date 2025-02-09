@@ -314,32 +314,31 @@ function drawPieChart(data) {
   });
 }
 
-let query = '';
+let query = '';  // ✅ 存储搜索关键词
 
-document.querySelector('.searchBar').addEventListener('input', (event) => {
+let searchInput = document.querySelector('.searchBar');
+
+searchInput.addEventListener('input', (event) => {
   query = event.target.value.toLowerCase().trim();  // 获取输入的搜索内容
   filterProjects();  // 过滤项目
 });
 
 function filterProjects() {
   let filteredProjects = projects.filter(project =>
-    project.title.toLowerCase().includes(query) || 
-    project.description.toLowerCase().includes(query) || 
-    String(project.year).includes(query)
+    project.title.toLowerCase().includes(query)
   );
 
-  console.log("🔍 Filtered items:", filteredProjects);
+  console.log("🔍 过滤后的项目:", filteredProjects);
   
   renderProjects(filteredProjects, document.querySelector('.projectsContainer'), 'h3');  // 更新项目列表
-  renderPieChart(filteredProjects);  // ✅ 重新渲染饼图，确保数据可视化也更新
+  renderPieChart(filteredProjects);  // ✅ 重新渲染饼图
 }
-
 
 fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
   if (data && data.length > 0) {
     projects = data;  // ✅ 存储项目数据
     filterProjects();  // ✅ 立即渲染项目和饼图
   } else {
-    console.error("❌ Failed to load project data");
+    console.error("❌ 未能加载项目数据！");
   }
 });
