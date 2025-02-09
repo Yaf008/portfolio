@@ -314,31 +314,103 @@ function drawPieChart(data) {
   });
 }
 
+let projects = []; // ✅ 确保 `projects` 变量在全局作用域中定义
 let query = '';  // ✅ 存储搜索关键词
 
+// 📌 1. 获取项目数据并初始化页面
+fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
+  if (data && data.length > 0) {
+    projects = data;  // ✅ 赋值项目数据
+    filterProjects();  // ✅ 渲染项目列表和饼图
+  } else {
+    console.error("❌ 未能加载项目数据！");
+  }
+});
+
+// 📌 2. 监听搜索框输入，更新 `query` 并过滤项目
 let searchInput = document.querySelector('.searchBar');
 
 searchInput.addEventListener('input', (event) => {
-  query = event.target.value.toLowerCase().trim();  // 获取输入的搜索内容
-  filterProjects();  // 过滤项目
+  if (!projects || projects.length === 0) return;  // ✅ 避免未加载数据时搜索
+  query = event.target.value.toLowerCase().trim();
+  filterProjects();
 });
 
+// 📌 3. 过滤项目并更新可见内容
 function filterProjects() {
+  if (!projects || projects.length === 0) {
+    console.warn("⚠️ 项目数据为空，无法过滤！");
+    return;
+  }
+
   let filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(query)
   );
 
   console.log("🔍 过滤后的项目:", filteredProjects);
-  
-  renderProjects(filteredProjects, document.querySelector('.projectsContainer'), 'h3');  // 更新项目列表
+
+  renderProjects(filteredProjects, document.querySelector('.projectsContainer'), 'h3');  
   renderPieChart(filteredProjects);  // ✅ 重新渲染饼图
 }
 
-fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
-  if (data && data.length > 0) {
-    projects = data;  // ✅ 存储项目数据
-    filterProjects();  // ✅ 立即渲染项目和饼图
-  } else {
-    console.error("❌ 未能加载项目数据！");
+// 📌 4. 重新渲染饼图
+function renderPieChart(filteredProjects) {
+  let rolledData = d3.rollups(
+    filteredProjects,
+    (v) => v.length,
+    (d) => String(d.year)  // ✅ 确保 `year` 是字符串
+  );
+
+  let data = rolledData.map(([year, count]) => ({ value: count, label: year }));
+
+  drawPieChart(data);
+}
+
+// 📌 5. 生成饼图
+function drawPieChart(data) {
+  let pie = d3.pie().value(d => d.value);
+  let arcData = pie(data);
+  let radius = 80;
+  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+  let colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+  let svg = d3.select('.pie-chart')
+              .attr("width", 200)
+              .attr("height", 200)
+              .attr("viewBox", "-100 -100 200 200");  // ✅ 确保饼图是圆形
+
+  svg.selectAll("*").remove();  // ✅ 清空旧的饼图
+
+  svg.selectAll('path')
+    .data(arcData)
+    .enter()
+    .append('path')
+    .attr('d', arcGenerator)
+    .attr('fill', (d, i) => colors(i))
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1);
+
+  let legend = d3.select('.legend');
+  legend.selectAll('*').remove();
+  data.forEach((d, idx) => {
+    legend.append('li')
+          .attr('class', 'legend-item')
+          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
+  });
+}
+
+// 📌 6. 获取 JSON 数据
+async function fetchJSON(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`❌ 获取 JSON 数据失败: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("📌 成功获取 JSON 数据:", data);
+    return data;
+  } catch (error) {
+    console.error('❌ 获取 JSON 数据时出错:', error);
+    return [];
   }
-});
+}
