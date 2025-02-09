@@ -314,4 +314,22 @@ function drawPieChart(data) {
   });
 }
 
+let query = '';
 
+document.querySelector('.searchBar').addEventListener('input', (event) => {
+  query = event.target.value.toLowerCase().trim();  // 获取输入的搜索内容
+  filterProjects();  // 过滤项目
+});
+
+function filterProjects() {
+  let filteredProjects = projects.filter(project =>
+    project.title.toLowerCase().includes(query) || 
+    project.description.toLowerCase().includes(query) || 
+    String(project.year).includes(query)
+  );
+
+  console.log("🔍 过滤后的项目:", filteredProjects);
+  
+  renderProjects(filteredProjects, document.querySelector('.projectsContainer'), 'h3');  // 更新项目列表
+  renderPieChart(filteredProjects);  // ✅ 重新渲染饼图，确保数据可视化也更新
+}
