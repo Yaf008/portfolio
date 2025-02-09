@@ -225,43 +225,29 @@ let data = [
   { value: 5, label: 'cherries' },
 ];
 
+let sliceGenerator = d3.pie().value((d) => d.value);
+
+let total = 0;
+
+for (let d of data) {
+  total += d.value;
+}
+
+let angle = 0;
+let arcData = [];
+
+for (let d of data) {
+  let endAngle = angle + (d.value / total) * 2 * Math.PI;
+  arcData.push({ startAngle: angle, endAngle });
+  angle = endAngle;
+}
+
+let arcs = arcData.map((d) => arcGenerator(d));
+
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-// **动态调整半径**
-function getRadius() {
-  return Math.min(window.innerWidth * 0.15, 150);  // 让饼图最大 150px，但随屏幕大小变化
-}
-
-// **重新渲染饼图**
-function renderPieChart() {
-  d3.select('.pie-chart').selectAll('*').remove();  // 清空之前的图表
-  
-  let radius = getRadius();
-  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
-
-  let pie = d3.pie().value(d => d.value);
-  let arcData = pie(data);
-
-  let svg = d3.select('.pie-chart');
-
-  svg.selectAll('path')
-    .data(arcData)
-    .enter()
-    .append('path')
-    .attr('d', arcGenerator)
-    .attr('fill', (d, i) => colors(i))
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1);
-}
-
-// **首次加载和窗口调整时渲染**
-renderPieChart();
-window.addEventListener('resize', renderPieChart);
-
-// **添加图例**
-let legend = d3.select('.legend');
-data.forEach((d, idx) => {
-  legend.append('li')
-    .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
+arcData.forEach((d, i) => {
+  d3.select('svg')
+  .attr('d', arcGenerator(d)) // 这里 d 已经包含 startAngle 和 endAngle
+    .attr("fill", colors(i));
 });
-
