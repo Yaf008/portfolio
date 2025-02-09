@@ -258,3 +258,15 @@ data.forEach((d, idx) => {
         .attr('class', 'legend-item')
         .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
 });
+
+
+fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
+  if (projects && projects.length > 0) {  
+    console.log("✅ 获取到的项目数据:", projects);
+    
+    // ✅ 传递 `projects` 数据到 renderPieChart()
+    renderPieChart(projects);
+  } else {
+    console.error("❌ 未能加载项目数据，或数据为空！");
+  }
+});
