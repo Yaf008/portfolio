@@ -289,8 +289,8 @@ function drawPieChart(data) {
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
   let svg = d3.select('.pie-chart')
-              .attr("width", 400)  
-              .attr("height", 400)
+              .attr("width", 300)  
+              .attr("height", 300)
               .attr("viewBox", "-100 -100 200 200") 
 
 
