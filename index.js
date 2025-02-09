@@ -4,10 +4,10 @@ import { fetchJSON, renderProjects } from './global.js';
 document.addEventListener("DOMContentLoaded", async () => {
     const projectsContainer = document.querySelector('.latest-projects');
     if (projectsContainer) {
-        const projects = await fetchJSON('./lib/project.json');  // 确保路径正确
+        const projects = await fetchJSON('./lib/project.json');  
         if (projects) {
-            const latestProjects = projects.slice(0, 3);  // 获取前 3 个项目
-            renderProjects(latestProjects, projectsContainer, 'h2'); // 用 h2 作为标题
+            const latestProjects = projects.slice(0, 3);  
+            renderProjects(latestProjects, projectsContainer, 'h2'); 
         } else {
             console.error("无法加载最新项目");
         }
@@ -18,9 +18,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 import { fetchGitHubData } from './global.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const profileStats = document.querySelector('#profile-stats'); // 选择容器
+    const profileStats = document.querySelector('#profile-stats'); 
     if (profileStats) {
-        const githubData = await fetchGitHubData('yaf008'); // ✅ 使用你的 GitHub 用户名
+        const githubData = await fetchGitHubData('yaf008'); 
         if (githubData) {
             profileStats.innerHTML = `
                 <dl class="profile-grid">
