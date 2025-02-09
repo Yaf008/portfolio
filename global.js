@@ -234,6 +234,8 @@ let data = [
   { value: 5, label: 'cherries' },
 ];
 
+let sliceGenerator = d3.pie().value((d) => d.value);
+
 let total = 0;
 
 for (let d of data) {
@@ -264,7 +266,7 @@ arcs.forEach((arc, i) => {
 
 //step 2
 
-let sliceGenerator = d3.pie().value((d) => d.value);
+
 
 let legend = d3.select('.legend');
 
