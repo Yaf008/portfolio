@@ -216,15 +216,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
-
-let arc = arcGenerator({
-  startAngle: 0,
-  endAngle: 2 * Math.PI,
-});
-
-d3.select('svg').append('path').attr('d', arc).attr('fill', 'red');
-
 let data = [
   { value: 1, label: 'apples' },
   { value: 2, label: 'oranges' },
@@ -234,34 +225,29 @@ let data = [
   { value: 5, label: 'cherries' },
 ];
 
+// 1. 生成饼图数据
+let pie = d3.pie().value(d => d.value);
+let arcData = pie(data);
 
-let sliceGenerator = d3.pie().value((d) => d.value);
+// 2. 创建弧形生成器
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
-let total = 0;
-
-for (let d of data) {
-  total += d.value;
-}
-
-let angle = 0;
-let arcData = [];
-
-for (let d of data) {
-  let endAngle = angle + (d.value / total) * 2 * Math.PI;
-  arcData.push({ startAngle: angle, endAngle });
-  angle = endAngle;
-}
-
-let arcs = arcData.map((d) => arcGenerator(d));
-
+// 3. 颜色映射
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-arcData.forEach((d, i) => {
-  d3.select('svg')
-  .attr('d', arcGenerator(d)) // 这里 d 已经包含 startAngle 和 endAngle
-  .attr("fill", colors(i));
-});
+// 4. 选择 SVG 并绑定数据
+let svg = d3.select('svg');
 
+svg.selectAll('path')
+  .data(arcData) // 绑定数据
+  .enter()
+  .append('path') // 创建 path
+  .attr('d', arcGenerator) // 生成路径
+  .attr('fill', (d, i) => colors(i)) // 按索引填充颜色
+  .attr('stroke', 'white')
+  .attr('stroke-width', 1);
+
+// 5. 创建图例
 let legend = d3.select('.legend');
 
 data.forEach((d, idx) => {
