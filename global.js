@@ -255,14 +255,6 @@ let arcs = arcData.map((d) => arcGenerator(d));
 
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-arcs.forEach((arc, i) => {
-  d3.select('svg')
-    .append('path')
-    .attr('d', arc)
-    .attr("fill", colors(i)) // Fill in the attribute for fill color via indexing the colors variable
-})
-
-
 
 //step 2
 
