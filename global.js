@@ -13,7 +13,7 @@ console.log("脚本仍在运行，pages 数组已定义");
 let nav = document.createElement('nav');
 document.body.prepend(nav);
 
-const REPO_NAME = location.pathname.split('/')[1] || ''; // 动态获取仓库名称
+const REPO_NAME = location.pathname.split('/')[1] || ''; // Get the warehouse name dynamically
 
 let links = [];
 
@@ -21,9 +21,9 @@ for (let p of pages) {
   let url = p.url;
   let title = p.title;
 
-  // 修正路径问题
+  // Corrected path problem
   if (!url.startsWith('http')) {
-    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // 确保路径格式正确
+    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // Make sure the path format is correct
   }
   console.log("生成的 URL:", url);
 
@@ -33,25 +33,30 @@ for (let p of pages) {
   nav.append(a);
   links.push(a);
 
-  // 外部链接在新窗口中打开
+  // External links A new window opens
   if (a.host !== location.host) {
     a.target = '_blank';
   }
 }
 
-// 优化当前类添加
+// Optimizes current class addition
 let currentLink = links.find(link => {
   let linkPath = new URL(link.href, location.origin).pathname.replace(/\/$/, '');
   let currentPath = location.pathname.replace(/\/$/, '');
   return linkPath === currentPath;
 });
 
-// 安全地添加 'current' 类
+// Securely add the 'current' class
 currentLink?.classList.add('current');
 
 console.log("脚本执行完毕");
 
-// 颜色主题切换
+
+
+
+
+
+
 document.body.insertAdjacentHTML(
   'afterbegin',
   `
@@ -73,6 +78,7 @@ select.addEventListener('input', function (event) {
   localStorage.setItem('colorScheme', colorScheme); // 保存用户偏好
 });
 
+
 window.addEventListener('DOMContentLoaded', () => {
   const savedScheme = localStorage.getItem('colorScheme');
   if (savedScheme) {
@@ -81,87 +87,188 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 项目过滤和饼图交互
-let selectedIndex = -1; // 初始化为-1，表示没有选中任何楔形
-let projects = []; // 存储项目数据
 
-document.addEventListener("DOMContentLoaded", () => {
-  const projectsContainer = document.querySelector('.projects');
-  if (projectsContainer) {
-    fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
-      if (data) {
-        projects = data;
-        renderProjects(projects, projectsContainer, 'h3');
-        document.querySelector('#project-count').textContent = projects.length;
-        renderPieChart(projects);
-      } else {
-        console.error("Failed to load project data");
-      }
-    });
-  }
+const form = document.querySelector('#contact-form');
+
+form?.addEventListener('submit', (event) => {
+    event.preventDefault(); 
+
+   
+    const data = new FormData(form);
+    const mailto = form.action;
+    const params = [];
+
+  
+    for (let [name, value] of data) {
+        params.push(`${name}=${encodeURIComponent(value)}`);
+    }
+
+    
+    const url = `${mailto}?${params.join('&')}`;
+
+  
+    location.href = url;
 });
 
-// 获取 JSON 数据
+//lab4 java II
+
+console.log("Global.js loading...");
+
 export async function fetchJSON(url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to obtain project data: ${response.statusText}`);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to obtain project data: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("Acquired data:", data);
+        return data;
+    } catch (error) {
+        console.error('Error obtaining or parsing JSON data:', error);
+        return null;
     }
-    const data = await response.json();
-    console.log("Acquired data:", data);
-    return data;
-  } catch (error) {
-    console.error('Error obtaining or parsing JSON data:', error);
-    return null;
-  }
 }
 
-// 渲染项目列表
 export function renderProjects(projects, containerElement, headingLevel = 'h2') {
   if (!containerElement) {
     console.error("The .projects container cannot be found");
     return;
-  }
+}
 
-  containerElement.innerHTML = '';
-  projects.forEach(project => {
+containerElement.innerHTML = '';
+projects.forEach(project => {
     const article = document.createElement('article');
 
-    // 创建标题
+    // Create a title
     const titleElement = document.createElement(headingLevel);
     titleElement.textContent = project.title;
 
-    // 创建图片
+    // Create an image
     const imageElement = document.createElement('img');
     imageElement.src = project.image;
     imageElement.alt = project.title;
 
-    // 创建描述
+    // Create a description
     const descriptionElement = document.createElement('p');
     descriptionElement.textContent = project.description;
 
-    // 创建年份元素
+   // Create the year element
     const yearElement = document.createElement('p');
     yearElement.textContent = project.year;
-    yearElement.classList.add('project-year');
+    yearElement.classList.add('project-year'); 
 
-    // 包装描述和年份
+    // Package description and year
     const detailsWrapper = document.createElement('div');
     detailsWrapper.classList.add('project-details');
     detailsWrapper.appendChild(descriptionElement);
     detailsWrapper.appendChild(yearElement);
 
-    // 组合元素
+    // Combine elements
     article.appendChild(titleElement);
     article.appendChild(imageElement);
     article.appendChild(detailsWrapper);
 
     containerElement.appendChild(article);
-  });
+});
 }
 
-// 渲染饼图
+document.addEventListener("DOMContentLoaded", () => {
+    const projectsContainer = document.querySelector('.projects');
+    if (projectsContainer) {
+        fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
+            if (projects) {
+                renderProjects(projects, projectsContainer, 'h3');
+                document.querySelector('#project-count').textContent = projects.length;
+            } else {
+                console.error("Failed to load project data");
+            }
+        });
+    }
+});
+
+
+//github data
+export async function fetchGitHubData(username) {
+  try {
+      const response = await fetch(`https://api.github.com/users/${username}`);
+      if (!response.ok) {
+          throw new Error(`The GitHub API request failed: ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log("GitHub data:", data);  // 调试信息
+      return data;
+  } catch (error) {
+      console.error('Error getting GitHub data:', error);
+      return null;
+  }
+}
+
+//lab5
+
+document.addEventListener("DOMContentLoaded", () => {
+  d3.select("#projects-pie-plot")
+    .append("circle")
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("r", 50)
+    .attr("fill", "red");
+});
+
+
+
+// 📌 1. 获取项目数据并渲染饼图
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+
+let data = [
+  { value: 1, label: 'apples' },
+  { value: 2, label: 'oranges' },
+  { value: 3, label: 'mangos' },
+  { value: 4, label: 'pears' },
+  { value: 5, label: 'limes' },
+  { value: 5, label: 'cherries' },
+];
+
+// 1. 生成饼图数据
+let pie = d3.pie().value(d => d.value);
+let arcData = pie(data);
+
+// 2. 创建弧形生成器
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
+
+// 3. 颜色映射
+let colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+// 4. 选择 SVG 并绑定数据
+let svg = d3.select('svg');
+
+svg.selectAll('path')
+  .data(arcData) // 绑定数据
+  .enter()
+  .append('path') // 创建 path
+  .attr('d', arcGenerator) // 生成路径
+  .attr('fill', (d, i) => colors(i)) // 按索引填充颜色
+  .attr('stroke', 'white')
+  .attr('stroke-width', 1);
+
+// 5. 创建图例
+let legend = d3.select('.legend');
+
+data.forEach((d, idx) => {
+  legend.append('li')
+        .attr('class', 'legend-item')
+        .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
+});
+
+
+fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
+  if (projects && projects.length > 0) {
+    renderPieChart(projects);  
+  } else {
+    console.error("❌ 项目数据为空！");
+  }
+});
+
+
 function renderPieChart(filteredProjects) {
   let rolledData = d3.rollups(
     filteredProjects,
@@ -174,7 +281,6 @@ function renderPieChart(filteredProjects) {
   drawPieChart(data);
 }
 
-// 绘制饼图
 function drawPieChart(data) {
   let pie = d3.pie().value(d => d.value);
   let arcData = pie(data);
@@ -183,11 +289,12 @@ function drawPieChart(data) {
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
   let svg = d3.select('.pie-chart')
-              .attr("width", 300)
+              .attr("width", 300)  
               .attr("height", 300)
-              .attr("viewBox", "-100 -100 200 200");
+              .attr("viewBox", "-100 -100 200 200") 
 
-  svg.selectAll("*").remove();
+
+  svg.selectAll("*").remove(); 
 
   svg.selectAll('path')
     .data(arcData)
@@ -196,54 +303,38 @@ function drawPieChart(data) {
     .attr('d', arcGenerator)
     .attr('fill', (d, i) => colors(i))
     .attr('stroke', 'white')
-    .attr('stroke-width', 1)
-    .on('click', (event, d, i) => {
-      selectedIndex = selectedIndex === i ? -1 : i; // 切换选中状态
-      updateSelection();
-    });
+    .attr('stroke-width', 1);
 
   let legend = d3.select('.legend');
   legend.selectAll('*').remove();
   data.forEach((d, idx) => {
     legend.append('li')
           .attr('class', 'legend-item')
-          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`)
-          .on('click', () => {
-            selectedIndex = selectedIndex === idx ? -1 : idx; // 切换选中状态
-            updateSelection();
-          });
+          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
   });
-
-  function updateSelection() {
-    svg.selectAll('path')
-      .attr('class', (_, idx) => (idx === selectedIndex ? 'selected' : ''));
-
-    legend.selectAll('.legend-item')
-      .attr('class', (_, idx) => (idx === selectedIndex ? 'legend-item selected' : 'legend-item'));
-
-    filterProjects();
-  }
 }
 
-// 根据选中的年份过滤项目
-function filterProjects() {
-  let filteredProjects = selectedIndex === -1 ? projects : projects.filter(project => String(project.year) === data[selectedIndex].label);
+
+let query = '';
+let searchInput = document.querySelector('.searchBar');
+
+searchInput.addEventListener('input', (event) => {
+  // 更新查询值
+  query = event.target.value.toLowerCase();
+
+  // 过滤项目
+  let filteredProjects = projects.filter((project) => 
+    project.title.toLowerCase().includes(query)
+  );
+
+  // 渲染更新后的项目
   renderProjects(filteredProjects, document.querySelector('.projects'), 'h3');
   document.querySelector('#project-count').textContent = filteredProjects.length;
-}
 
-// GitHub 数据获取
-export async function fetchGitHubData(username) {
-  try {
-    const response = await fetch(`https://api.github.com/users/${username}`);
-    if (!response.ok) {
-      throw new Error(`The GitHub API request failed: ${response.statusText}`);
-    }
-    const data = await response.json();
-    console.log("GitHub data:", data);  // 调试信息
-    return data;
-  } catch (error) {
-    console.error('Error getting GitHub data:', error);
-    return null;
+  // 更新饼图
+  if (filteredProjects.length > 0) {
+    renderPieChart(filteredProjects);
+  } else {
+    console.error("❌ 没有匹配的项目！");
   }
-}
+});
