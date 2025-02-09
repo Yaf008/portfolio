@@ -275,32 +275,37 @@ function drawPieChart(data) {
 }
 
 function updateChartAndProjects(data, selectedIndex) {
-  console.log("Selected index:", selectedIndex); // 查看选中的索引
+  console.log("选中的索引:", selectedIndex);
+
   const svg = d3.select('.pie-chart');
   const legend = d3.select('.legend');
 
   svg.selectAll('path')
-      .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
+     .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
 
   legend.selectAll('.legend-item')
-      .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
+        .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
 
   const projectsContainer = document.querySelector('.projects');
 
   if (selectedIndex === -1) {
-      console.log("No filter applied. Showing all projects.");
-      renderProjects(projects, projectsContainer, 'h3');
+    console.log("未选中年份，显示所有项目");
+    renderProjects(projects, projectsContainer, 'h3'); 
   } else {
-      const selectedYear = data[selectedIndex]?.label;
-      console.log("Filtering for year:", selectedYear); // 调试年份
+    const selectedYear = data[selectedIndex]?.label;
+    console.log("选中的年份:", selectedYear);
 
-      const filteredProjects = projects.filter(project => String(project.year) === selectedYear);
-      console.log("Filtered projects:", filteredProjects); // 查看过滤后的项目
+    if (!selectedYear) {
+      console.error("未找到有效的年份");
+      return;
+    }
 
-      renderProjects(filteredProjects, projectsContainer, 'h3');
+    const filteredProjects = projects.filter(project => String(project.year) === selectedYear);
+    console.log("筛选后项目数量:", filteredProjects.length);
+
+    renderProjects(filteredProjects, projectsContainer, 'h3'); 
   }
 }
-
 
 
 
