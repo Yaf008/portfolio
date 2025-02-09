@@ -214,45 +214,54 @@ document.addEventListener("DOMContentLoaded", () => {
     .attr("fill", "red");
 });
 
+
+
+// 📌 1. 获取项目数据并渲染饼图
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
 // 📌 1. 获取项目数据并渲染饼图
 fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(projects => {
-  if (projects) {
-    renderPieChart(projects);  // ✅ 渲染真实的项目数据
+  if (projects && projects.length > 0) {  
+    console.log("✅ Successfully fetched project data:", projects);
+    renderPieChart(projects);
   } else {
-    console.error("Failed to load project data");
+    console.error("❌ Failed to load project data or no projects available!");
   }
 });
 
 // 📌 2. 按年份统计项目数并转换为饼图数据
 function renderPieChart(projects) {
+  console.log("📌 Received projects data:", projects);
+
   let rolledData = d3.rollups(
     projects,
     (v) => v.length,
-    (d) => d.year
+    (d) => String(d.year)  // ✅ 确保 year 是字符串
   );
+
+  console.log("📌 Rolled data:", rolledData);
 
   let data = rolledData.map(([year, count]) => {
     return { value: count, label: year };
   });
 
+  console.log("📌 Final data for pie chart:", data);
   drawPieChart(data);
 }
 
 // 📌 3. 绘制饼图
 function drawPieChart(data) {
+  console.log("📊 Drawing pie chart with data:", data);
+
   let pie = d3.pie().value(d => d.value);
   let arcData = pie(data);
   let radius = 80;
   let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
   let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
-  // ✅ 清除旧图表，避免重复绘制
   let svg = d3.select('.pie-chart');
-  svg.selectAll('*').remove();
+  svg.selectAll("*").remove();  
 
-  // ✅ 绑定数据并绘制扇形
   svg.selectAll('path')
     .data(arcData)
     .enter()
@@ -262,7 +271,6 @@ function drawPieChart(data) {
     .attr('stroke', 'white')
     .attr('stroke-width', 1);
 
-  // ✅ 更新图例
   let legend = d3.select('.legend');
   legend.selectAll('*').remove();
   data.forEach((d, idx) => {
@@ -270,6 +278,8 @@ function drawPieChart(data) {
           .attr('class', 'legend-item')
           .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
   });
+
+  console.log("✅ Pie chart drawn successfully!");
 }
 
 // 📌 4. 确保 `fetchJSON()` 存在
@@ -277,11 +287,13 @@ async function fetchJSON(url) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch project data: ${response.statusText}`);
+      throw new Error(`❌ Failed to fetch project data: ${response.statusText}`);
     }
-    return await response.json();
+    const data = await response.json();
+    console.log("📌 JSON data fetched:", data);
+    return data;
   } catch (error) {
-    console.error('Error fetching or parsing JSON data:', error);
-    return null;
+    console.error('❌ Error fetching or parsing JSON data:', error);
+    return [];
   }
 }
