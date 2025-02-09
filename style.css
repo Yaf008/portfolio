@@ -155,7 +155,7 @@ nav a.current {
   display: inline-block;
   border-radius: 50%;
   border: 1px solid #000;
-} 
+}
 
 /* 让图例变成网格布局 */
 .legend {
@@ -171,7 +171,6 @@ nav a.current {
   background-color: #f9f9f9;
 }
 
-/* 让单个图例项的布局更美观 */
 .legend li {
   display: flex;
   align-items: center; /* 垂直居中 */
@@ -183,7 +182,6 @@ nav a.current {
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
   transition: transform 0.2s ease-in-out;
 }
-
 
 .legend li:hover {
   transform: scale(1.05);
