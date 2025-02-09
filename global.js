@@ -239,14 +239,14 @@ let sliceGenerator = d3.pie().value((d) => d.value);
 let total = 0;
 
 for (let d of data) {
-  total += d;
+  total += d.value;
 }
 
 let angle = 0;
 let arcData = [];
 
 for (let d of data) {
-  let endAngle = angle + (d / total) * 2 * Math.PI;
+  let endAngle = angle + (d.value / total) * 2 * Math.PI;
   arcData.push({ startAngle: angle, endAngle });
   angle = endAngle;
 }
@@ -258,7 +258,12 @@ let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
 //step 2
 
-
+arcData.forEach((d, i) => {
+  d3.select('svg')
+    .append('path')
+    .attr('d', arcGenerator(d)) // 这里 d 已经包含 startAngle 和 endAngle
+    .attr("fill", colors(i));
+});
 
 let legend = d3.select('.legend');
 
