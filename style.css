@@ -134,76 +134,44 @@ nav a.current {
 }
 
 
+.container {
+  display: flex;           /* 使用 flexbox 让饼图和图例并排 */
+  align-items: center;     /* 让饼图和图例垂直居中 */
+  justify-content: center; /* 居中对齐 */
+  gap: 20px;               /* 设置饼图和图例之间的间距 */
+  flex-wrap: wrap;         /* 在小屏幕时自动换行 */
+  max-width: 600px;        /* 限制最大宽度，避免图表过大 */
+  margin: auto;            /* 让容器整体居中 */
+}
+
+.pie-chart {
+  width: 40vw;          /* 让饼图适应屏幕宽度 */
+  max-width: 300px;     /* 限制饼图最大宽度 */
+  height: auto;
+  display: block;
+}
+
 .legend {
   list-style: none;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
+  flex: 1;              /* 让图例占据剩余空间 */
+  min-width: 150px;
 }
 
 .legend li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1rem;
-}
-
-.legend .swatch {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  border-radius: 50%;
-  border: 1px solid #000;
-}
-
-/* 让图例变成网格布局 */
-.legend {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr)); /* 自适应列数 */
-  gap: 10px; /* 让网格中的元素间隔合理 */
-  list-style: none;
-  padding: 10px;
-  margin: 20px auto;
-  max-width: 500px;
-  border: 1px solid #ccc; /* 给图例添加边框 */
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-/* 让单个图例项的布局更美观 */
-.legend li {
-  display: flex;
-  align-items: center; /* 垂直居中 */
-  gap: 8px; /* 颜色示例和文本之间的间隔 */
+  gap: 8px;
   font-size: 14px;
-  padding: 5px;
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
-  transition: transform 0.2s ease-in-out;
 }
-
-
-.legend li:hover {
-  transform: scale(1.05);
-}
-
 
 .legend .swatch {
   width: 16px;
   height: 16px;
   display: inline-block;
-  aspect-ratio: 1 / 1; 
   border-radius: 50%;
   border: 1px solid #000;
-}
-
-svg {
-  max-width: 300px; /* 设置最大宽度 */
-  min-width: 150px;; /* 设置最大高度 */
-  width: 100%; /* 让它在小屏幕上自适应 */
-  height: auto;
-  display: block;
-  margin: auto; /* 居中 */
-}
+} 
