@@ -206,3 +206,25 @@ nav a.current {
   border-radius: 50%;
   border: 1px solid #000;
 }
+
+
+
+.pie-chart:has(path:hover) path:not(:hover) {
+  opacity: 0.5;
+}
+
+
+.pie-chart path {
+  transition: opacity 300ms, fill 300ms;
+  cursor: pointer;
+}
+
+.pie-chart path.selected {
+  fill: var(--color-accent) !important;
+}
+
+
+.legend .selected {
+  color: var(--color-accent);
+  font-weight: bold;
+}
