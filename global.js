@@ -219,7 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // 📌 1. 获取项目数据并渲染饼图
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
-
 let data = [
   { value: 1, label: 'apples' },
   { value: 2, label: 'oranges' },
@@ -233,15 +232,14 @@ let data = [
 let pie = d3.pie().value(d => d.value);
 let arcData = pie(data);
 
-// 2. 设置饼图半径
-let radius = 80; // 修改为80px 让它更接近你的截图
-let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+// 2. 创建弧形生成器
+let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
 // 3. 颜色映射
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
 // 4. 选择 SVG 并绑定数据
-let svg = d3.select('.pie-chart');
+let svg = d3.select('svg');
 
 svg.selectAll('path')
   .data(arcData) // 绑定数据
