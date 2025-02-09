@@ -236,7 +236,7 @@ let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
 // 4. 选择 SVG 并绑定数据
-let svg = d3.select('svg');
+let svg = d3.select('.pie-chart');
 
 svg.selectAll('path')
   .data(arcData) // 绑定数据
@@ -255,4 +255,3 @@ data.forEach((d, idx) => {
         .attr('class', 'legend-item')
         .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`);
 });
-
