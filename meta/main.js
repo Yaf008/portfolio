@@ -13,6 +13,7 @@ async function loadData() {
   
     processCommits();
     displayStats();
+    createScatterplot();
   }
   
 
@@ -128,5 +129,76 @@ function processCommits() {
     const maxDay = d3.greatest(workByDay, d => d[1])?.[0];
     dl.append('dt').text('Most Active Day of the Week');
     dl.append('dd').text(maxDay);
+  }
+  
+
+
+  function createScatterplot() {
+    
+    const width = 1000;
+    const height = 600;
+  
+   
+    const svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .style('overflow', 'visible');
+  
+    
+    const xScale = d3
+      .scaleTime()
+      .domain(d3.extent(commits, (d) => d.datetime)) 
+      .range([50, width - 50]) 
+      .nice();
+  
+    
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, 24])
+      .range([height - 50, 50]);
+  
+    
+    const dots = svg.append('g').attr('class', 'dots');
+  
+    dots
+      .selectAll('circle')
+      .data(commits)
+      .join('circle')
+      .attr('cx', (d) => xScale(d.datetime)) 
+      .attr('cy', (d) => yScale(d.hourFrac)) 
+      .attr('r', 5) 
+      .attr('fill', 'steelblue') 
+      .attr('opacity', 0.7); 
+  
+    const xAxis = d3.axisBottom(xScale).ticks(6);
+    svg
+      .append('g')
+      .attr('transform', `translate(0, ${height - 50})`)
+      .call(xAxis);
+  
+    
+    const yAxis = d3.axisLeft(yScale).ticks(12);
+    svg
+      .append('g')
+      .attr('transform', `translate(50, 0)`)
+      .call(yAxis);
+  
+    // axis -X
+    svg
+      .append('text')
+      .attr('x', width / 2)
+      .attr('y', height - 10)
+      .attr('text-anchor', 'middle')
+      .text('Date');
+  
+    // axis -Y
+    svg
+      .append('text')
+      .attr('x', -height / 2)
+      .attr('y', 15)
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'rotate(-90)')
+      .text('Time of Day (Hours)');
   }
   
