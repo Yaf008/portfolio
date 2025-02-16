@@ -234,4 +234,27 @@ function processCommits() {
       .attr('transform', 'rotate(-90)')
       .text('Time of Day (Hours)');
   }
+
+  
+  function updateTooltipContent(commit) {
+    const link = document.getElementById('commit-link');
+    const date = document.getElementById('commit-date');
+    const time = document.getElementById('commit-time');
+    const author = document.getElementById('commit-author');
+    const lines = document.getElementById('commit-lines');
+  
+    if (!commit.id) {
+      document.getElementById('commit-tooltip').style.display = 'none';
+      return;
+    }
+  
+    document.getElementById('commit-tooltip').style.display = 'block';
+  
+    link.href = commit.url;
+    link.textContent = commit.id;
+    date.textContent = commit.datetime?.toLocaleDateString('en', { dateStyle: 'full' });
+    time.textContent = commit.datetime?.toLocaleTimeString('en', { timeStyle: 'short' });
+    author.textContent = commit.author;
+    lines.textContent = commit.totalLines;
+  }
   
