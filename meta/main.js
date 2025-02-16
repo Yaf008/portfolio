@@ -233,6 +233,19 @@ function processCommits() {
       .attr('text-anchor', 'middle')
       .attr('transform', 'rotate(-90)')
       .text('Time of Day (Hours)');
+
+
+    dots
+      .selectAll('circle')
+      .on('mouseenter', (event, commit) => {
+      updateTooltipContent(commit);
+      updateTooltipVisibility(true);
+      })
+      .on('mouseleave', () => {
+      updateTooltipContent({});
+      updateTooltipVisibility(false);
+    });
+
   }
 
   
