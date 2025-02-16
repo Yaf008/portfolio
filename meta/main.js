@@ -290,6 +290,13 @@ function processCommits() {
   
     return selectedCommits;
   }
+  
+  function brushed(event) {
+    brushSelection = event.selection;
+    updateSelection();
+    updateSelectionCount(); // ✅ Update count when brushing
+  }
+  
 
 
   function updateLanguageBreakdown() {
