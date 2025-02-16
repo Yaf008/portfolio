@@ -134,57 +134,78 @@ function processCommits() {
 
 
   function createScatterplot() {
-    
+    // Set dimensions
     const width = 1000;
     const height = 600;
   
-   
+    // Define margins
+    const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+  
+    // Define usable area
+    const usableArea = {
+      top: margin.top,
+      right: width - margin.right,
+      bottom: height - margin.bottom,
+      left: margin.left,
+      width: width - margin.left - margin.right,
+      height: height - margin.top - margin.bottom,
+    };
+  
+    // Create the SVG element
     const svg = d3
       .select('#chart')
       .append('svg')
-      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('width', width)
+      .attr('height', height)
       .style('overflow', 'visible');
   
-    
+    // Define scales
     const xScale = d3
       .scaleTime()
-      .domain(d3.extent(commits, (d) => d.datetime)) 
-      .range([50, width - 50]) 
+      .domain(d3.extent(commits, (d) => d.datetime))
+      .range([usableArea.left, usableArea.right])
       .nice();
   
-    
     const yScale = d3
       .scaleLinear()
       .domain([0, 24])
-      .range([height - 50, 50]);
+      .range([usableArea.bottom, usableArea.top]);
   
-    
+    // Create a group for dots
     const dots = svg.append('g').attr('class', 'dots');
   
+    // Add dots
     dots
       .selectAll('circle')
       .data(commits)
       .join('circle')
-      .attr('cx', (d) => xScale(d.datetime)) 
-      .attr('cy', (d) => yScale(d.hourFrac)) 
-      .attr('r', 5) 
-      .attr('fill', 'steelblue') 
-      .attr('opacity', 0.7); 
+      .attr('cx', (d) => xScale(d.datetime))
+      .attr('cy', (d) => yScale(d.hourFrac))
+      .attr('r', 5)
+      .attr('fill', 'steelblue')
+      .attr('opacity', 0.7);
   
+    // Create and format Y-axis
+    const yAxis = d3
+      .axisLeft(yScale)
+      .tickFormat((d) => String(d % 24).padStart(2, '0') + ':00');
+  
+    // Create and format X-axis
     const xAxis = d3.axisBottom(xScale).ticks(6);
+  
+    // Add X-axis
     svg
       .append('g')
-      .attr('transform', `translate(0, ${height - 50})`)
+      .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(xAxis);
   
-    
-    const yAxis = d3.axisLeft(yScale).ticks(12);
+    // Add Y-axis
     svg
       .append('g')
-      .attr('transform', `translate(50, 0)`)
+      .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(yAxis);
   
-    // axis -X
+    // Add X-axis label
     svg
       .append('text')
       .attr('x', width / 2)
@@ -192,7 +213,7 @@ function processCommits() {
       .attr('text-anchor', 'middle')
       .text('Date');
   
-    // axis -Y
+    // Add Y-axis label
     svg
       .append('text')
       .attr('x', -height / 2)
