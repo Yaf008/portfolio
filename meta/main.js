@@ -235,16 +235,18 @@ function processCommits() {
       .text('Time of Day (Hours)');
 
 
-    dots
+      dots
       .selectAll('circle')
       .on('mouseenter', (event, commit) => {
-      updateTooltipContent(commit);
-      updateTooltipVisibility(true);
+        updateTooltipContent(commit);
+        updateTooltipVisibility(true);
+        updateTooltipPosition(event);
       })
+      .on('mousemove', updateTooltipPosition) // Move tooltip as cursor moves
       .on('mouseleave', () => {
-      updateTooltipContent({});
-      updateTooltipVisibility(false);
-    });
+        updateTooltipContent({});
+        updateTooltipVisibility(false);
+      });
 
   }
 
