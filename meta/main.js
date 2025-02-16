@@ -170,43 +170,39 @@ function processCommits() {
       .scaleLinear()
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
-
+  
     // ✅ Fix Area Scaling: Change from scaleLinear() to scaleSqrt()
-  const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
-
-  const rScale = d3
-    .scaleSqrt() // Use square root scale for proper area scaling
-    .domain([minLines, maxLines])
-    .range([2, 30]); // Adjust range based on visual testing
-
+    const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
   
-    // ✅ Add gridlines BEFORE the axes
-    const gridlines = svg
-      .append('g')
-      .attr('class', 'gridlines')
-      .attr('transform', `translate(${usableArea.left}, 0)`);
-    
-    gridlines.call(
-      d3.axisLeft(yScale)
-        .tickFormat('') // Hide labels
-        .tickSize(-usableArea.width) // Extend lines across the chart
-    );
+    const rScale = d3
+      .scaleSqrt() // Use square root scale for proper area scaling
+      .domain([minLines, maxLines])
+      .range([2, 30]); // Adjust range based on visual testing
   
-    // Create a group for dots
+    // ✅ Sort commits by totalLines in descending order
+    const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
+  
+    // Create dots
     const dots = svg.append('g').attr('class', 'dots');
-
-    
   
-    // Add dots
     dots
       .selectAll('circle')
-      .data(commits)
+      .data(sortedCommits) // Use sorted commits
       .join('circle')
       .attr('cx', (d) => xScale(d.datetime))
       .attr('cy', (d) => yScale(d.hourFrac))
-      .attr('r', 5)
-      .attr('fill', 'steelblue')
-      .attr('opacity', 0.7);
+      .attr('r', (d) => rScale(d.totalLines)) // ✅ Apply square root scale
+      .style('fill-opacity', 0.7) // Add transparency for overlapping dots
+      .on('mouseenter', function (event, d) {
+        d3.select(event.currentTarget).style('fill-opacity', 1); // Highlight on hover
+        updateTooltipContent(d);
+        updateTooltipVisibility(true);
+        updateTooltipPosition(event);
+      })
+      .on('mouseleave', function () {
+        d3.select(event.currentTarget).style('fill-opacity', 0.7); // Restore transparency
+        updateTooltipVisibility(false);
+      });
   
     // Create and format Y-axis
     const yAxis = d3
@@ -244,33 +240,8 @@ function processCommits() {
       .attr('text-anchor', 'middle')
       .attr('transform', 'rotate(-90)')
       .text('Time of Day (Hours)');
-
-
-    // Sort commits by totalLines in descending order (larger dots first)
-  const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
-
-  // Use sortedCommits instead of commits
-  dots
-    .selectAll('circle')
-    .data(sortedCommits)
-    .join('circle')
-    .attr('cx', (d) => xScale(d.datetime))
-    .attr('cy', (d) => yScale(d.hourFrac))
-    .attr('r', (d) => rScale(d.totalLines))
-    .style('fill-opacity', 0.7)
-    .on('mouseenter', function (event, d) {
-      d3.select(event.currentTarget).style('fill-opacity', 1);
-      updateTooltipContent(d);
-      updateTooltipVisibility(true);
-      updateTooltipPosition(event);
-    })
-    .on('mouseleave', function () {
-      d3.select(event.currentTarget).style('fill-opacity', 0.7);
-      updateTooltipVisibility(false);
-    });
-    
-
   }
+  
 
   
   function updateTooltipContent(commit) {
