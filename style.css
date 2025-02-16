@@ -313,3 +313,25 @@ circle {
 circle:hover {
   transform: scale(1.5);
 }
+
+
+dl.info {
+  /* Keep existing styles */
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  max-width: 250px;
+  transition-duration: 500ms;
+  transition-property: opacity, visibility;
+}
+
+/* Hide tooltip when not hovering */
+dl.info[hidden]:not(:hover, :focus-within) {
+  opacity: 0;
+  visibility: hidden;
+}

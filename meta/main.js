@@ -258,3 +258,9 @@ function processCommits() {
     lines.textContent = commit.totalLines;
   }
   
+
+  function updateTooltipVisibility(isVisible) {
+    const tooltip = document.getElementById('commit-tooltip');
+    tooltip.hidden = !isVisible;
+  }
+  
