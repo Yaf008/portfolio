@@ -170,6 +170,15 @@ function processCommits() {
       .scaleLinear()
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
+
+    // ✅ Fix Area Scaling: Change from scaleLinear() to scaleSqrt()
+  const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
+
+  const rScale = d3
+    .scaleSqrt() // Use square root scale for proper area scaling
+    .domain([minLines, maxLines])
+    .range([2, 30]); // Adjust range based on visual testing
+
   
     // ✅ Add gridlines BEFORE the axes
     const gridlines = svg
@@ -185,6 +194,8 @@ function processCommits() {
   
     // Create a group for dots
     const dots = svg.append('g').attr('class', 'dots');
+
+    
   
     // Add dots
     dots
@@ -235,18 +246,29 @@ function processCommits() {
       .text('Time of Day (Hours)');
 
 
-      dots
-      .selectAll('circle')
-      .on('mouseenter', (event, commit) => {
-        updateTooltipContent(commit);
-        updateTooltipVisibility(true);
-        updateTooltipPosition(event);
-      })
-      .on('mousemove', updateTooltipPosition) // Move tooltip as cursor moves
-      .on('mouseleave', () => {
-        updateTooltipContent({});
-        updateTooltipVisibility(false);
-      });
+    // Sort commits by totalLines in descending order (larger dots first)
+  const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
+
+  // Use sortedCommits instead of commits
+  dots
+    .selectAll('circle')
+    .data(sortedCommits)
+    .join('circle')
+    .attr('cx', (d) => xScale(d.datetime))
+    .attr('cy', (d) => yScale(d.hourFrac))
+    .attr('r', (d) => rScale(d.totalLines))
+    .style('fill-opacity', 0.7)
+    .on('mouseenter', function (event, d) {
+      d3.select(event.currentTarget).style('fill-opacity', 1);
+      updateTooltipContent(d);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mouseleave', function () {
+      d3.select(event.currentTarget).style('fill-opacity', 0.7);
+      updateTooltipVisibility(false);
+    });
+    
 
   }
 
