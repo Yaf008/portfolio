@@ -1,296 +1,273 @@
-console.log("IT’S ALIVE!");
+let data = [];
+let commits = [];
 
-let pages = [
-  { url: '', title: 'Home' },
-  { url: 'projects/', title: 'Projects' },
-  { url: 'CV/', title: 'Resume' },
-  { url: 'contact/', title: 'Contact' },
-  { url: 'https://github.com/Yaf008', title: 'GitHub' }
-];
-
-console.log("脚本仍在运行，pages 数组已定义");
-
-let nav = document.createElement('nav');
-document.body.prepend(nav);
-
-const REPO_NAME = location.pathname.split('/')[1] || ''; // Get the warehouse name dynamically
-
-let links = [];
-
-for (let p of pages) {
-  let url = p.url;
-  let title = p.title;
-
-  // Corrected path problem
-  if (!url.startsWith('http')) {
-    url = `/${REPO_NAME}/${url}`.replace(/\/+/g, '/'); // Make sure the path format is correct
+async function loadData() {
+    data = await d3.csv('loc.csv', (row) => ({
+      ...row,
+      line: Number(row.line),
+      depth: Number(row.depth),
+      length: Number(row.length),
+      date: new Date(row.date + 'T00:00' + row.timezone),
+      datetime: new Date(row.datetime),
+    }));
+  
+    processCommits();
+    displayStats();
+    createScatterplot();
+    brushSelector();
   }
-  console.log("生成的 URL:", url);
+  
 
-  let a = document.createElement('a');
-  a.href = url;
-  a.textContent = title;
-  nav.append(a);
-  links.push(a);
 
-  // External links A new window opens
-  if (a.host !== location.host) {
-    a.target = '_blank';
-  }
-}
-
-// Optimizes current class addition
-let currentLink = links.find(link => {
-  let linkPath = new URL(link.href, location.origin).pathname.replace(/\/$/, '');
-  let currentPath = location.pathname.replace(/\/$/, '');
-  return linkPath === currentPath;
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadData();
 });
 
-// Securely add the 'current' class
-currentLink?.classList.add('current');
 
-console.log("脚本执行完毕");
-
-document.body.insertAdjacentHTML(
-  'afterbegin',
-  `
-  <label class="color-scheme" style="position: absolute; top: 1rem; right: 1rem; font-size: 80%; font-family: inherit;">
-    Theme:
-    <select>
-      <option value="light dark">Automatic</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
-  </label>
-  `
-);
-
-const select = document.querySelector('.color-scheme select');
-select.addEventListener('input', function (event) {
-  const colorScheme = event.target.value;
-  document.documentElement.style.setProperty('color-scheme', colorScheme);
-  localStorage.setItem('colorScheme', colorScheme); // 保存用户偏好
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-  const savedScheme = localStorage.getItem('colorScheme');
-  if (savedScheme) {
-    document.documentElement.style.setProperty('color-scheme', savedScheme);
-    document.querySelector('.color-scheme select').value = savedScheme;
-  }
-});
-
-const form = document.querySelector('#contact-form');
-
-form?.addEventListener('submit', (event) => {
-    event.preventDefault(); 
-
-    const data = new FormData(form);
-    const mailto = form.action;
-    const params = [];
-
-    for (let [name, value] of data) {
-        params.push(`${name}=${encodeURIComponent(value)}`);
-    }
-
-    const url = `${mailto}?${params.join('&')}`;
-
-    location.href = url;
-});
-
-console.log("Global.js loading...");
-
-export async function fetchJSON(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to obtain project data: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("Acquired data:", data);
-        return data;
-    } catch (error) {
-        console.error('Error obtaining or parsing JSON data:', error);
-        return null;
-    }
-}
-
-export function renderProjects(projects, containerElement, headingLevel = 'h2') {
-  if (!containerElement) {
-    console.error("The .projects container cannot be found");
-    return;
-  }
-
-  containerElement.innerHTML = '';
-  projects.forEach(project => {
-    const article = document.createElement('article');
-
-    // Create a title
-    const titleElement = document.createElement(headingLevel);
-    titleElement.textContent = project.title;
-
-    // Create an image
-    const imageElement = document.createElement('img');
-    imageElement.src = project.image;
-    imageElement.alt = project.title;
-
-    // Create a description
-    const descriptionElement = document.createElement('p');
-    descriptionElement.textContent = project.description;
-
-    // Create the year element
-    const yearElement = document.createElement('p');
-    yearElement.textContent = project.year;
-    yearElement.classList.add('project-year');
-
-    // Package description and year
-    const detailsWrapper = document.createElement('div');
-    detailsWrapper.classList.add('project-details');
-    detailsWrapper.appendChild(descriptionElement);
-    detailsWrapper.appendChild(yearElement);
-
-    // Combine elements
-    article.appendChild(titleElement);
-    article.appendChild(imageElement);
-    article.appendChild(detailsWrapper);
-
-    containerElement.appendChild(article);
-  });
-}
-
-let projects = []; 
-let query = '';
-
-document.addEventListener("DOMContentLoaded", () => {
-  const projectsContainer = document.querySelector('.projects');
-  if (projectsContainer) {
-    fetchJSON('https://yaf008.github.io/portfolio/lib/project.json').then(data => {
-      if (data) {
-        projects = data; 
-        renderProjects(projects, projectsContainer, 'h3');
-        document.querySelector('#project-count').textContent = projects.length;
-
+function processCommits() {
+    commits = d3.groups(data, (d) => d.commit)
+      .map(([commit, lines]) => {
+        let first = lines[0]; // Get the first row of the commit
+  
+        let { author, date, time, timezone, datetime } = first;
+  
+        let ret = {
+          id: commit,
+          url: 'https://github.com/YOUR_REPO/commit/' + commit, // Replace with your warehouse
+          author,
+          date,
+          time,
+          timezone,
+          datetime,
+          // Calculation hours (e.g. 14:30 = 14.5)
+          hourFrac: datetime.getHours() + datetime.getMinutes() / 60,
+          // Count the number of rows modified by the commit
+          totalLines: lines.length,
+        };
+  
         
-        if (projects.length > 0) {
-          renderPieChart(projects);
-        }
-      } else {
-        console.error("Failed to load project data");
-      }
-    });
+        Object.defineProperty(ret, 'lines', {
+          value: lines,
+          writable: false, 
+          enumerable: false, 
+          configurable: false, 
+        });
+  
+        return ret;
+      });
   }
+  
 
- 
-  let searchInput = document.querySelector('.searchBar');
-  searchInput.addEventListener('input', (event) => {
-    query = event.target.value.toLowerCase();
-    let filteredProjects = projects.filter((project) => 
-      project.title.toLowerCase().includes(query)
-    );
-    renderProjects(filteredProjects, projectsContainer, 'h3');
-    document.querySelector('#project-count').textContent = filteredProjects.length;
 
+  function displayStats() {
+   
+    processCommits();
+  
     
-    if (filteredProjects.length > 0) {
-      renderPieChart(filteredProjects);
-    } else {
-      console.error("❌ 没有匹配的项目！");
+    const dl = d3.select('#stats').append('dl').attr('class', 'stats');
+  
+    
+  
+   // 代码总行数
+    dl.append('dt').html('Total <abbr title="Lines of Code">LOC</abbr>');
+    dl.append('dd').text(data.length);
+  
+    // Total number of submissions
+    dl.append('dt').text('Total Commits');
+    dl.append('dd').text(commits.length);
+  
+    
+    const fileCount = d3.group(data, d => d.file).size;
+    dl.append('dt').text('Total Files');
+    dl.append('dd').text(fileCount);
+  
+    
+    const maxFileLength = d3.max(data, d => d.line);
+    dl.append('dt').text('Longest File (Lines)');
+    dl.append('dd').text(maxFileLength);
+  
+
+    const fileLengths = d3.rollups(
+      data,
+      v => d3.max(v, d => d.line),
+      d => d.file
+    );
+    const avgFileLength = d3.mean(fileLengths, d => d[1]);
+    dl.append('dt').text('Average File Length (Lines)');
+    dl.append('dd').text(avgFileLength.toFixed(2));
+  
+   
+    const avgLineLength = d3.mean(data, d => d.length);
+    dl.append('dt').text('Average Line Length (Characters)');
+    dl.append('dd').text(avgLineLength.toFixed(2));
+  
+ 
+    const maxLineLength = d3.max(data, d => d.length);
+    dl.append('dt').text('Longest Line (Characters)');
+    dl.append('dd').text(maxLineLength);
+  
+
+    const maxDepth = d3.max(data, d => d.depth);
+    dl.append('dt').text('Maximum Depth');
+    dl.append('dd').text(maxDepth);
+  
+ 
+    const workByPeriod = d3.rollups(
+      data,
+      v => v.length,
+      d => new Date(d.datetime).toLocaleString('en', { dayPeriod: 'short' })
+    );
+    const maxPeriod = d3.greatest(workByPeriod, d => d[1])?.[0];
+    dl.append('dt').text('Most Active Time of Day');
+    dl.append('dd').text(maxPeriod);
+  
+
+    const workByDay = d3.rollups(
+      data,
+      v => v.length,
+      d => new Date(d.datetime).toLocaleString('en', { weekday: 'long' })
+    );
+    const maxDay = d3.greatest(workByDay, d => d[1])?.[0];
+    dl.append('dt').text('Most Active Day of the Week');
+    dl.append('dd').text(maxDay);
+  }
+  
+
+
+  let xScale, yScale; // Declare globally so it can be used in brushing
+
+  function createScatterplot() {
+    const width = 1000;
+    const height = 600;
+    const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+  
+    const usableArea = {
+      top: margin.top,
+      right: width - margin.right,
+      bottom: height - margin.bottom,
+      left: margin.left,
+      width: width - margin.left - margin.right,
+      height: height - margin.top - margin.bottom,
+    };
+  
+    const svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .style('overflow', 'visible');
+  
+    // ✅ Use global xScale & yScale
+    xScale = d3
+      .scaleTime()
+      .domain(d3.extent(commits, (d) => d.datetime))
+      .range([usableArea.left, usableArea.right])
+      .nice();
+  
+    yScale = d3
+      .scaleLinear()
+      .domain([0, 24])
+      .range([usableArea.bottom, usableArea.top]);
+  
+    // Create dots
+    const dots = svg.append('g').attr('class', 'dots');
+  
+    dots
+      .selectAll('circle')
+      .data(commits)
+      .join('circle')
+      .attr('cx', (d) => xScale(d.datetime))
+      .attr('cy', (d) => yScale(d.hourFrac))
+      .attr('r', (d) => rScale(d.totalLines))
+      .attr('fill', 'steelblue')
+      .style('fill-opacity', 0.7);
+  
+    // Add axes
+    const xAxis = d3.axisBottom(xScale).ticks(6);
+    svg.append('g').attr('transform', `translate(0, ${usableArea.bottom})`).call(xAxis);
+    const yAxis = d3.axisLeft(yScale).tickFormat((d) => `${d % 24}:00`);
+    svg.append('g').attr('transform', `translate(${usableArea.left}, 0)`).call(yAxis);
+  }
+  
+  
+
+  
+  function updateTooltipContent(commit) {
+    const link = document.getElementById('commit-link');
+    const date = document.getElementById('commit-date');
+    const time = document.getElementById('commit-time');
+    const author = document.getElementById('commit-author');
+    const lines = document.getElementById('commit-lines');
+  
+    if (!commit.id) {
+      document.getElementById('commit-tooltip').style.display = 'none';
+      return;
     }
-  });
-});
-
-// GitHub 数据
-export async function fetchGitHubData(username) {
-  try {
-      const response = await fetch(`https://api.github.com/users/${username}`);
-      if (!response.ok) {
-          throw new Error(`The GitHub API request failed: ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log("GitHub data:", data);
-      return data;
-  } catch (error) {
-      console.error('Error getting GitHub data:', error);
-      return null;
-  }
-}
-
-// D3.js 饼图
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
-
-function renderPieChart(filteredProjects) {
-  let rolledData = d3.rollups(
-    filteredProjects,
-    (v) => v.length,
-    (d) => String(d.year)  
-  );
-
-  let data = rolledData.map(([year, count]) => ({ value: count, label: year }));
-
-  drawPieChart(data);
-}
-
-function drawPieChart(data) {
-  let pie = d3.pie().value(d => d.value);
-  let arcData = pie(data);
-  let radius = 80;
-  let arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
-  let colors = d3.scaleOrdinal(d3.schemeTableau10);
-
-  let svg = d3.select('.pie-chart')
-              .attr("width", 300)  
-              .attr("height", 300)
-              .attr("viewBox", "-100 -100 200 200");
-
-  svg.selectAll("*").remove(); 
-
-  // 绘制饼图楔形
-  svg.selectAll('path')
-    .data(arcData)
-    .enter()
-    .append('path')
-    .attr('d', arcGenerator)
-    .attr('fill', (d, i) => colors(i))
-    .attr('stroke', 'white')
-    .attr('stroke-width', 1)
-    .on('click', (event, d) => {
-      selectedIndex = selectedIndex === d.index ? -1 : d.index; // 切换选中状态
-      updateChartAndProjects(data, selectedIndex); // 更新图表和项目
-    });
-
-  // 绘制图例
-  let legend = d3.select('.legend');
-  legend.selectAll('*').remove();
-  data.forEach((d, idx) => {
-    legend.append('li')
-          .attr('class', 'legend-item')
-          .html(`<span class="swatch" style="background-color: ${colors(idx)};"></span> ${d.label} <em>(${d.value})</em>`)
-          .on('click', () => {
-            selectedIndex = selectedIndex === idx ? -1 : idx; // 切换选中状态
-            updateChartAndProjects(data, selectedIndex); // 更新图表和项目
-          });
-  });
-}
-
-function updateChartAndProjects(data, selectedIndex) {
-  const svg = d3.select('.pie-chart');
-  const legend = d3.select('.legend');
-
   
-  svg.selectAll('path')
-     .attr('class', (d, i) => (i === selectedIndex ? 'selected' : ''));
-
-
-  legend.selectAll('.legend-item')
-        .attr('class', (d, i) => (i === selectedIndex ? 'legend-item selected' : 'legend-item'));
-
+    document.getElementById('commit-tooltip').style.display = 'block';
   
-  const projectsContainer = document.querySelector('.projects');
-  if (selectedIndex === -1) {
-    renderProjects(projects, projectsContainer, 'h3'); 
-  } else {
-    const selectedYear = data[selectedIndex].label;
-    const filteredProjects = projects.filter(project => String(project.year) === selectedYear); // 过滤项目
-    renderProjects(filteredProjects, projectsContainer, 'h3'); 
+    link.href = commit.url;
+    link.textContent = commit.id;
+    date.textContent = commit.datetime?.toLocaleDateString('en', { dateStyle: 'full' });
+    time.textContent = commit.datetime?.toLocaleTimeString('en', { timeStyle: 'short' });
+    author.textContent = commit.author;
+    lines.textContent = commit.totalLines;
   }
-}
+  
+
+   function updateTooltipVisibility(isVisible) {
+    const tooltip = document.getElementById('commit-tooltip');
+    tooltip.hidden = !isVisible;
+  }
+  
+   function updateTooltipPosition(event) {
+    const tooltip = document.getElementById('commit-tooltip');
+    tooltip.style.left = `${event.clientX}px`;
+    tooltip.style.top = `${event.clientY}px`;
+  }
+
+   function brushSelector() {
+    const svg = document.querySelector('svg');
+  
+    // Attach brush and listen for start, brush, and end events
+    d3.select(svg).call(d3.brush().on('start brush end', brushed));
+  }
+
+
+  let brushSelection = null; // Global brush selection
+
+  function brushed(event) {
+  brushSelection = event.selection;
+  updateSelection();
+  }
+
+  function brushSelector() {
+  const svg = document.querySelector('svg');
+
+  d3.select(svg)
+    .call(d3.brush().on('start brush end', brushed));
+
+  // Raise dots above brush overlay
+  d3.select(svg).selectAll('.dots, .overlay ~ *').raise();
+  }
+
+
+  function isCommitSelected(commit) {
+    if (!brushSelection) return false;
+  
+    const min = { x: brushSelection[0][0], y: brushSelection[0][1] };
+    const max = { x: brushSelection[1][0], y: brushSelection[1][1] };
+  
+    const x = xScale(commit.datetime);
+    const y = yScale(commit.hourFrac);
+  
+    return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+  }
+
+
+  function updateSelection() {
+    d3.selectAll('circle')
+      .classed('selected', (d) => isCommitSelected(d));
+  }
+  
+  
