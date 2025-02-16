@@ -301,14 +301,6 @@ function processCommits() {
     return selectedCommits;
   }
 
-  function brushed(event) {
-    brushSelection = event.selection;
-    updateSelection();
-    updateSelectionCount(); // ✅ Update count when brushing
-  }
-  
-
-
   function updateLanguageBreakdown() {
     const selectedCommits = brushSelection
       ? commits.filter(isCommitSelected)
@@ -344,3 +336,18 @@ function processCommits() {
   
     return breakdown;
   }
+  
+
+  function brushed(event) {
+    brushSelection = event.selection;
+    updateSelection();
+    updateSelectionCount();
+    updateLanguageBreakdown(); // ✅ Update language breakdown when brushing
+  }
+  
+  
+
+
+  
+
+  
