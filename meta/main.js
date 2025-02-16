@@ -14,6 +14,7 @@ async function loadData() {
     processCommits();
     displayStats();
     createScatterplot();
+    brushSelector();
   }
   
 
@@ -241,6 +242,9 @@ function processCommits() {
       .attr('text-anchor', 'middle')
       .attr('transform', 'rotate(-90)')
       .text('Time of Day (Hours)');
+
+
+
   }
   
 
@@ -281,5 +285,10 @@ function processCommits() {
 
   function brushSelector() {
     const svg = document.querySelector('svg');
+  
+    // Create brush
     d3.select(svg).call(d3.brush());
+  
+    // Raise dots and everything after overlay
+    d3.select(svg).selectAll('.dots, .overlay ~ *').raise();
   }
