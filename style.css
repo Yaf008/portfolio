@@ -260,3 +260,14 @@ path {
   margin-left: 10px;
   font-size: 1.1em;
 }
+
+
+.gridlines line {
+  stroke: #ddd;  /* Light gray */
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.gridlines path {
+  display: none; /* Hide the default axis path */
+}

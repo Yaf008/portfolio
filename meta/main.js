@@ -171,6 +171,18 @@ function processCommits() {
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
   
+    // ✅ Add gridlines BEFORE the axes
+    const gridlines = svg
+      .append('g')
+      .attr('class', 'gridlines')
+      .attr('transform', `translate(${usableArea.left}, 0)`);
+    
+    gridlines.call(
+      d3.axisLeft(yScale)
+        .tickFormat('') // Hide labels
+        .tickSize(-usableArea.width) // Extend lines across the chart
+    );
+  
     // Create a group for dots
     const dots = svg.append('g').attr('class', 'dots');
   
