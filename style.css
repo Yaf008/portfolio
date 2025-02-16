@@ -239,3 +239,24 @@ path {
   transition: opacity 300ms;
   cursor: pointer;
 }
+
+
+ \\meta
+ .stats {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+.stats dt {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #007bff;
+}
+
+.stats dd {
+  margin-left: 10px;
+  font-size: 1.1em;
+}
