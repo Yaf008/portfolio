@@ -74,7 +74,7 @@ function processCommits() {
     dl.append('dt').text('Total Commits');
     dl.append('dd').text(commits.length);
   
-    /
+    
     const fileCount = d3.group(data, d => d.file).size;
     dl.append('dt').text('Total Files');
     dl.append('dd').text(fileCount);
