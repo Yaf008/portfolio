@@ -192,7 +192,17 @@ function processCommits() {
       .attr('cy', (d) => yScale(d.hourFrac))
       .attr('r', (d) => rScale(d.totalLines))
       .attr('fill', 'steelblue')
-      .style('fill-opacity', 0.7);
+      .style('fill-opacity', 0.7)
+      .on('mouseenter', function (event, d) {
+        updateTooltipContent(d);
+        updateTooltipVisibility(true);
+      })
+      .on('mousemove', function (event) {
+        updateTooltipPosition(event);
+      })
+      .on('mouseleave', function () {
+        updateTooltipVisibility(false);
+      });
   
     // Add axes
     const xAxis = d3.axisBottom(xScale).ticks(6);
@@ -290,7 +300,7 @@ function processCommits() {
   
     return selectedCommits;
   }
-  
+
   function brushed(event) {
     brushSelection = event.selection;
     updateSelection();
