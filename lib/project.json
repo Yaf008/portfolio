@@ -1,9 +1,9 @@
 [
     {
-        "title": "Lorem ipsum dolor sit.",
+        "title": "Geospatial visualizations",
         "year": "2024",
-        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
-        "description": "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Architecto deserunt possimus, ex perferendis quos rerum veniam, explicabo minus minima consequuntur laudantium labore consectetur facilis vero autem porro dolore, quibusdam alias."
+        "image": "images/yajing_fang.jpg",
+        "description": "This project is a map - or network-based visual analysis tool to show travel between specific locations (such as traffic flow, flights, commutes, etc.)."
     },
     {
         "title": "Assumenda non eos dignissimos.",
