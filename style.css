@@ -357,4 +357,8 @@ circle.selected {
   stroke-width: 2px;
 }
 
+img {
+  max-width: 100%; 
+  height: auto;
+}
 
