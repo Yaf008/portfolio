@@ -364,11 +364,17 @@ img {
 
 
 circle {
-  transition: all 200ms, r calc(var(--r) * 100ms);
-}
-
-@starting-style {
-  r: 0;
+  transition: all 0.3s ease;
+  fill: steelblue;
+  &.selected {
+    fill: orange;
+    stroke: black;
+  }
+  
+  @starting-style {
+    r: 0;
+    opacity: 0;
+  }
 }
 
 

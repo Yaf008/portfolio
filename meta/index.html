@@ -11,14 +11,16 @@
 
 </head>
 <body>
-  <h1>Meta</h1>
+    <h1>Meta</h1>
     <div id="stats"></div>
 
-    <label>
-      Show commits until：
-      <input id="commit-slider" type="range" min="0" max="100" value="100" />
-      <time id="selectedTime"></time>
-    </label>
+    <div style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0">
+      <label style="flex: 1">
+        Show commits until:
+        <input id="commit-slider" type="range" min="0" max="100" value="100">
+      </label>
+      <time id="selectedTime" style="margin-left: auto"></time>
+    </div>
 
     <h2>Commits by Time of Day</h2>
     <div id="chart"></div>
