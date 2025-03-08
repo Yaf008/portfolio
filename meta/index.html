@@ -12,32 +12,28 @@
 </head>
 <body>
   <h1>Meta</h1>
-  <div id="stats"></div>
+    <div id="stats"></div>
 
-  <!-- 添加时间筛选滑块 -->
-  <label>
-    Show commits until:
-    <input id="commit-slider" type="range" min="0" max="100" value="100" />
-    <time id="selectedTime"></time>
-  </label>
+    <label>
+      Show commits until：
+      <input id="commit-slider" type="range" min="0" max="100" value="100" />
+      <time id="selectedTime"></time>
+    </label>
 
-  <h2>Commits by Time of Day</h2>
-  <div id="chart"></div>
+    <h2>Commits by Time of Day</h2>
+    <div id="chart"></div>
 
-  <!-- 提交信息的工具提示 -->
-  <div id="commit-tooltip" hidden>
-    <a id="commit-link" target="_blank"></a>
-    <div id="commit-date"></div>
-    <div id="commit-time"></div>
-    <div id="commit-author"></div>
-    <div id="commit-lines"></div>
-  </div>
+    <div id="commit-tooltip" hidden>
+      <a id="commit-link" target="_blank"></a>
+      <div id="commit-date"></div>
+      <div id="commit-time"></div>
+      <div id="commit-author"></div>
+      <div id="commit-lines"></div>
+    </div>
 
-  <!-- 显示选中提交的数量 -->
-  <div id="selection-count"></div>
-
-  <!-- 显示语言分布 -->
-  <div id="language-breakdown"></div>
+    <div id="selection-count"></div>
+    <div id="language-breakdown"></div>
+    <input type="range" id="timeSlider" min="0" max="100" value="100">
 
 </body>
 </html>
