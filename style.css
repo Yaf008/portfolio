@@ -370,3 +370,8 @@ circle {
 @starting-style {
   r: 0;
 }
+
+
+#commit-slider {
+  width: 100%;
+}
