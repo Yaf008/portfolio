@@ -6,6 +6,15 @@ let commitProgress = 100;
 let timeScale;
 let commitMaxTime;
 
+// ✅ 监听 `DOMContentLoaded` 事件，确保 HTML 加载完毕后运行
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await loadData();
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+});
+
 // ✅ 异步加载数据
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
@@ -53,13 +62,8 @@ function processCommits() {
             };
         });
 
-    filterCommitsByTime();
+    filterCommitsByTime(); // 确保 `filteredCommits` 被正确初始化
 }
-
-// ✅ 监听 `DOMContentLoaded` 事件，确保 HTML 加载完毕再运行 JavaScript
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadData();
-});
 
 // ✅ 绑定滑块和时间显示
 const commitSlider = d3.select('#commit-slider');
@@ -67,6 +71,10 @@ const selectedTime = d3.select('#selectedTime');
 
 // ✅ 过滤提交数据
 function filterCommitsByTime() {
+    if (!commits || commits.length === 0) {
+        console.warn("No commits available for filtering.");
+        return;
+    }
     filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
 }
 
@@ -83,6 +91,28 @@ commitSlider.on('input', function () {
     commitProgress = +this.value;
     updateSelectedTime();
 });
+
+// ✅ 显示统计信息
+function displayStats() {
+    if (!data || data.length === 0) {
+        console.warn("No data available for stats.");
+        return;
+    }
+
+    d3.select('#stats').html('');
+
+    const dl = d3.select('#stats').append('dl').attr('class', 'stats');
+
+    dl.append('dt').text('Total LOC');
+    dl.append('dd').text(data.length);
+
+    dl.append('dt').text('Total Commits');
+    dl.append('dd').text(commits.length);
+
+    const fileCount = d3.group(data, d => d.file).size;
+    dl.append('dt').text('Total Files');
+    dl.append('dd').text(fileCount);
+}
 
 // ✅ 创建散点图
 let xScale, yScale;
@@ -132,38 +162,18 @@ function createScatterplot() {
         .attr('cy', (d) => yScale(d.hourFrac))
         .attr('r', (d) => rScale(d.totalLines))
         .attr('fill', 'steelblue')
-        .style('fill-opacity', 0.7)
-        .on('mouseenter', function (event, d) {
-            updateTooltipContent(d);
-            updateTooltipVisibility(true);
-        })
-        .on('mousemove', function (event) {
-            updateTooltipPosition(event);
-        })
-        .on('mouseleave', function () {
-            updateTooltipVisibility(false);
-        });
-
-    const xAxis = d3.axisBottom(xScale).ticks(6);
-    svg.append('g')
-        .attr('transform', `translate(0, ${usableArea.bottom})`)
-        .call(xAxis);
-
-    const yAxis = d3.axisLeft(yScale).tickFormat((d) => `${d % 24}:00`);
-    svg.append('g')
-        .attr('transform', `translate(${usableArea.left}, 0)`)
-        .call(yAxis);
+        .style('fill-opacity', 0.7);
 }
 
 // ✅ 更新散点图，仅绘制 `filteredCommits`
 function updateScatterPlot(filteredCommits) {
-    const svg = d3.select('#chart svg');
-    const dots = svg.select('.dots');
-
-    if (filteredCommits.length === 0) {
+    if (!filteredCommits || filteredCommits.length === 0) {
         console.warn("No commits to display.");
         return;
     }
+
+    const svg = d3.select('#chart svg');
+    const dots = svg.select('.dots');
 
     const circles = dots.selectAll('circle')
         .data(filteredCommits, d => d.id);
