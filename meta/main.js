@@ -165,6 +165,13 @@ function createScatterplot() {
         .style('fill-opacity', 0.7);
 }
 
+const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+circle.setAttribute("cx", "50");
+circle.setAttribute("cy", "50");
+circle.setAttribute("r", "30");
+circle.style.setProperty("--r", "30");
+document.querySelector("svg").appendChild(circle);
+
 // ✅ 更新散点图，仅绘制 `filteredCommits`
 function updateScatterPlot(filteredCommits) {
     if (!filteredCommits || filteredCommits.length === 0) {
