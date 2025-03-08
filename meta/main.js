@@ -1,5 +1,6 @@
 let data = [];
 let commits = [];
+let selectedCommits = [];
 
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
@@ -270,15 +271,7 @@ function processCommits() {
 
 
   function isCommitSelected(commit) {
-    if (!brushSelection) return false;
-  
-    const min = { x: brushSelection[0][0], y: brushSelection[0][1] };
-    const max = { x: brushSelection[1][0], y: brushSelection[1][1] };
-  
-    const x = xScale(commit.datetime);
-    const y = yScale(commit.hourFrac);
-  
-    return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+    return selectedCommits.includes(commit);
   }
 
 
@@ -286,6 +279,14 @@ function processCommits() {
     d3.selectAll('circle')
       .classed('selected', (d) => isCommitSelected(d));
   }
+
+  d3.selectAll('.commit')
+  .on('mouseenter', function (event, d) {
+    d3.select(event.currentTarget).classed('selected', isCommitSelected(d));
+  })
+  .on('mouseleave', function (event, d) {
+    d3.select(event.currentTarget).classed('selected', false);
+  });
   
 
   function updateSelectionCount() {
@@ -338,16 +339,17 @@ function processCommits() {
   }
   
 
-  function brushed(event) {
-    brushSelection = event.selection;
-    updateSelection();
-    updateSelectionCount();
-    updateLanguageBreakdown(); // ✅ Update language breakdown when brushing
+  function brushed(evt) {
+    let brushSelection = evt.selection;
+    selectedCommits = !brushSelection
+      ? []
+      : commits.filter((commit) => {
+          let min = { x: brushSelection[0][0], y: brushSelection[0][1] };
+          let max = { x: brushSelection[1][0], y: brushSelection[1][1] };
+          let x = xScale(commit.date);
+          let y = yScale(commit.hourFrac);
+  
+          return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+        });
   }
-  
-  
-
-
-  
-
   
