@@ -362,3 +362,11 @@ img {
   height: auto;
 }
 
+
+circle {
+  transition: all 200ms, r 300ms ease-in-out;
+}
+
+@starting-style {
+  r: 0;
+}

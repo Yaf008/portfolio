@@ -370,4 +370,6 @@ function processCommits() {
     selectedTime.text(commitMaxTime.toLocaleString());
   });
 
-  
+  d3.selectAll('circle')
+  .attr('r', d => d.radius)  // 假设 `d.radius` 代表每个圆的半径
+  .style('--r', d => d.radius);
