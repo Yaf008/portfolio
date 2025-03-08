@@ -64,9 +64,17 @@ const commitSlider = d3.select('#commit-slider');
 const selectedTime = d3.select('#selectedTime');
 
 // ✅ 更新滑块对应的时间
-function updateSelectedTime() {
-    commitMaxTime = timeScale.invert(commitProgress);
-    selectedTime.text(commitMaxTime.toLocaleString());
+function updateTimeScale() {
+  if (commits.length === 0) {
+      console.warn("No commits available to update time scale.");
+      return;
+  }
+
+  timeScale = d3.scaleTime()
+      .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
+      .range([0, 100]);
+
+  commitMaxTime = timeScale.invert(commitProgress);
 }
 
 // ✅ 监听滑块事件，实时更新时间 & 过滤数据
@@ -163,7 +171,6 @@ function updateScatterPlot(filteredCommits) {
   const svg = d3.select('#chart svg');
   const dots = svg.select('.dots');
 
-  // 重新绑定数据
   const circles = dots.selectAll('circle')
       .data(filteredCommits, d => d.id);
 
@@ -172,20 +179,20 @@ function updateScatterPlot(filteredCommits) {
           enter => enter.append('circle')
               .attr('cx', d => xScale(d.datetime))
               .attr('cy', d => yScale(d.hourFrac))
-              .attr('r', 0)  // 初始半径为 0
+              .attr('r', 0)
               .attr('fill', 'steelblue')
               .style('fill-opacity', 0.7)
               .transition().duration(200)
-              .attr('r', d => d.totalLines),  // 让点恢复到原大小
+              .attr('r', d => d.totalLines),
 
           update => update.transition().duration(200)
               .attr('cx', d => xScale(d.datetime))
               .attr('cy', d => yScale(d.hourFrac)),
 
           exit => exit.transition().duration(200)
-              .attr('r', 0)  // 让点缩小
+              .attr('r', 0)
               .style('opacity', 0)
-              .remove()  // 确保点被移除
+              .remove()
       );
 }
 
