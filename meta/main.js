@@ -4,6 +4,7 @@ let selectedCommits = [];
 let commitProgress = 100;
 let filteredCommits = [];
 let xScale, yScale;
+let timeScale;
 
 async function loadData() {
   data = await d3.csv('loc.csv', (row) => ({
@@ -19,6 +20,23 @@ async function loadData() {
   displayStats();
   createScatterplot(commits);
   brushSelector();
+
+  // 初始化时间尺度
+  timeScale = d3.scaleTime()
+    .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
+    .range([0, 100]);
+
+  // 初始化滑块事件
+  const commitSlider = document.getElementById('commit-slider');
+  const selectedTime = document.getElementById('selectedTime');
+
+  commitSlider.addEventListener('input', () => {
+    commitProgress = Number(commitSlider.value);
+    const commitMaxTime = timeScale.invert(commitProgress);
+    selectedTime.textContent = commitMaxTime.toLocaleString();
+    filterCommitsByTime();
+    updateScatterplot(filteredCommits);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -298,25 +316,7 @@ function updateLanguageBreakdown() {
   return breakdown;
 }
 
-let timeScale = d3.scaleTime()
-  .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
-  .range([0, 100]);
-
-let commitMaxTime = timeScale.invert(commitProgress);
-
-const timeSlider = document.getElementById('timeSlider');
-const selectedTime = document.getElementById('selectedTime');
-
-timeSlider.addEventListener('input', updateTimeDisplay);
-
-function updateTimeDisplay() {
-  commitProgress = Number(timeSlider.value);
-  commitMaxTime = timeScale.invert(commitProgress);
-  selectedTime.textContent = commitMaxTime.toLocaleString();
-  filterCommitsByTime();
-  updateScatterplot(filteredCommits);
-}
-
 function filterCommitsByTime() {
+  const commitMaxTime = timeScale.invert(commitProgress);
   filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
 }
