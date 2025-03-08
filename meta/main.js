@@ -70,9 +70,10 @@ function updateSelectedTime() {
 
 // ✅ 监听滑块事件，实时更新时间 & 过滤数据
 commitSlider.on('input', function () {
-    commitProgress = +this.value;
-    updateSelectedTime();
-    filterCommits();
+  commitProgress = +this.value;
+  console.log("Current commitProgress:", commitProgress);
+  updateSelectedTime();
+  filterCommits();
 });
 
 // ✅ 过滤数据并更新可视化
@@ -181,10 +182,10 @@ function updateScatterPlot(filteredCommits) {
             update => update.transition().duration(200)
                 .attr('cx', d => xScale(d.datetime))
                 .attr('cy', d => yScale(d.hourFrac)),
-            exit => exit.transition()
+                exit => exit.transition()
                 .duration(200)
-                .style('opacity', 0)  // 先让它透明，而不是直接删除
-                .remove()
+                .attr('r', 0)  // 让点缩小，但不删除
+                .style('opacity', 0)
         );
 }
 
@@ -263,3 +264,4 @@ function displayStats() {
     dl.append('dt').text('Most Active Day of the Week');
     dl.append('dd').text(maxDay);
 }
+
