@@ -1,6 +1,10 @@
 let data = [];
 let commits = [];
 let selectedCommits = [];
+let commitProgress = 100;
+let timeScale = d3.scaleTime([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)], [0, 100]);
+let commitMaxTime = timeScale.invert(commitProgress);
+
 
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
@@ -352,4 +356,18 @@ function processCommits() {
           return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
         });
   }
+
+
+  const commitSlider = d3.select('#commit-slider');
+  const selectedTime = d3.select('#selectedTime');
+
+  selectedTime.text(timeScale.invert(commitProgress).toLocaleString());
+
+
+  commitSlider.on('input', function () {
+    commitProgress = +this.value;
+    commitMaxTime = timeScale.invert(commitProgress);
+    selectedTime.text(commitMaxTime.toLocaleString());
+  });
+
   
