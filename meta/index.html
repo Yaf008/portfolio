@@ -25,16 +25,15 @@
     <h2>Commits by Time of Day</h2>
     <div id="chart"></div>
 
-    <div id="commit-tooltip" hidden>
-      <a id="commit-link" target="_blank"></a>
-      <div id="commit-date"></div>
-      <div id="commit-time"></div>
-      <div id="commit-author"></div>
-      <div id="commit-lines"></div>
+    <!-- 修改后的工具提示 -->
+    <div id="commit-tooltip" class="tooltip" hidden>
+      <a id="commit-link" target="_blank" class="tooltip-link"></a>
+      <div class="tooltip-item" id="commit-date"></div>
+      <div class="tooltip-item" id="commit-time"></div>
+      <div class="tooltip-item" id="commit-author"></div>
+      <div class="tooltip-item" id="commit-lines"></div>
     </div>
 
-    <div id="selection-count"></div>
-    <div id="language-breakdown"></div>
     
 </body>
 </html>

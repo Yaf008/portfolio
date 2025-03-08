@@ -1,3 +1,4 @@
+// 完整代码（包含原有和修改部分）
 let data = [];
 let commits = [];
 let selectedCommits = [];
@@ -5,7 +6,6 @@ let commitProgress = 100;
 let timeScale;
 let commitMaxTime;
 
-// ✅ 异步加载数据
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
         ...row,
@@ -23,22 +23,10 @@ async function loadData() {
     brushSelector();
 }
 
-// ✅ 确保 `timeScale` 在数据加载后才计算
-function filterCommits() {
-  let commitMaxTime = timeScale.invert(commitProgress);
-
-  // 确保每次都从完整的数据中筛选，而不是依赖之前的过滤结果
-  let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-
-  updateScatterPlot(filteredCommits);
-}
-
-// ✅ 处理提交数据
 function processCommits() {
     commits = d3.groups(data, (d) => d.commit)
         .map(([commit, lines]) => {
             let first = lines[0]; 
-
             return {
                 id: commit,
                 url: `https://github.com/YOUR_REPO/commit/${commit}`,
@@ -54,63 +42,60 @@ function processCommits() {
         });
 }
 
-// ✅ 监听 `DOMContentLoaded` 事件，确保 HTML 加载完毕再运行 JavaScript
 document.addEventListener('DOMContentLoaded', async () => {
     await loadData();
 });
 
-// ✅ 绑定滑块和时间显示
-const commitSlider = d3.select('#commit-slider');
-const selectedTime = d3.select('#selectedTime');
-
-// ✅ 更新滑块对应的时间
-function updateTimeScale() {
-  if (commits.length === 0) {
-      console.warn("No commits available to update time scale.");
-      return;
-  }
-
-  timeScale = d3.scaleTime()
-      .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
-      .range([0, 100]);
-
-  commitMaxTime = timeScale.invert(commitProgress);
-  console.log("Updated timeScale domain:", timeScale.domain());
+// 工具提示功能
+function updateTooltipContent(d) {
+    d3.select('#commit-tooltip')
+        .select('#commit-link')
+        .attr('href', d.url)
+        .text(d.id.substring(0, 6));
+    d3.select('#commit-date').text(d.date.toDateString());
+    d3.select('#commit-time').text(d.datetime.toLocaleTimeString());
+    d3.select('#commit-author').text(`Author: ${d.author}`);
+    d3.select('#commit-lines').text(`Lines: ${d.totalLines}`);
 }
 
-// ✅ 监听滑块事件，实时更新时间 & 过滤数据
-commitSlider.on('input', function () {
-  commitProgress = +this.value;
-  console.log("Slider changed, commitProgress:", commitProgress);
-  updateSelectedTime();
-  filterCommits();
-});
+function updateTooltipVisibility(visible) {
+    d3.select('#commit-tooltip').attr('hidden', !visible);
+}
 
+function updateTooltipPosition(event) {
+    d3.select('#commit-tooltip')
+        .style('left', `${event.pageX + 10}px`)
+        .style('top', `${event.pageY + 10}px`);
+}
 
-// ✅ 过滤数据并更新可视化
+// 时间筛选功能
 function filterCommits() {
-  if (!timeScale) {
-      console.warn("Time scale is not initialized.");
-      return;
-  }
-
-  commitMaxTime = timeScale.invert(commitProgress);
-  console.log("Filtering commits up to:", commitMaxTime);
-
-  let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-
-  updateScatterPlot(filteredCommits);
+    if (!timeScale || commits.length === 0) return;
+    
+    commitMaxTime = timeScale.invert(commitProgress);
+    const filtered = commits.filter(d => d.datetime <= commitMaxTime);
+    updateScatterPlot(filtered);
+    updateSelectedTime();
 }
 
+function updateTimeScale() {
+    timeScale = d3.scaleTime()
+        .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
+        .range([0, 100]);
+    commitMaxTime = timeScale.invert(commitProgress);
+}
 
-// ✅ 创建散点图
+function updateSelectedTime() {
+    selectedTime.text(d3.timeFormat("%Y-%m-%d %H:%M")(commitMaxTime));
+}
+
+// 散点图相关
 let xScale, yScale;
 
 function createScatterplot() {
     const width = 1000;
     const height = 600;
     const margin = { top: 10, right: 10, bottom: 50, left: 50 };
-
     const usableArea = {
         top: margin.top,
         right: width - margin.right,
@@ -120,31 +105,29 @@ function createScatterplot() {
         height: height - margin.top - margin.bottom,
     };
 
-    const svg = d3
-        .select('#chart')
+    const svg = d3.select('#chart')
         .append('svg')
         .attr('width', width)
         .attr('height', height)
         .style('overflow', 'visible');
 
-    xScale = d3
-        .scaleTime()
+    xScale = d3.scaleTime()
         .domain(d3.extent(commits, (d) => d.datetime))
         .range([usableArea.left, usableArea.right])
         .nice();
 
-    yScale = d3
-        .scaleLinear()
+    yScale = d3.scaleLinear()
         .domain([0, 24])
         .range([usableArea.bottom, usableArea.top]);
 
-    const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
-    const rScale = d3.scaleSqrt().domain([minLines, maxLines]).range([2, 30]);
+    const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
+    const rScale = d3.scaleSqrt()
+        .domain([minLines, maxLines])
+        .range([2, 15]);
 
     const dots = svg.append('g').attr('class', 'dots');
 
-    dots
-        .selectAll('circle')
+    dots.selectAll('circle')
         .data(commits)
         .join('circle')
         .attr('cx', (d) => xScale(d.datetime))
@@ -156,72 +139,46 @@ function createScatterplot() {
             updateTooltipContent(d);
             updateTooltipVisibility(true);
         })
-        .on('mousemove', function (event) {
-            updateTooltipPosition(event);
-        })
-        .on('mouseleave', function () {
-            updateTooltipVisibility(false);
-        });
+        .on('mousemove', updateTooltipPosition)
+        .on('mouseleave', () => updateTooltipVisibility(false));
 
-    const xAxis = d3.axisBottom(xScale).ticks(6);
+    // 添加坐标轴
     svg.append('g')
         .attr('transform', `translate(0, ${usableArea.bottom})`)
-        .call(xAxis);
+        .call(d3.axisBottom(xScale).ticks(6));
 
-    const yAxis = d3.axisLeft(yScale).tickFormat((d) => `${d % 24}:00`);
     svg.append('g')
         .attr('transform', `translate(${usableArea.left}, 0)`)
-        .call(yAxis);
+        .call(d3.axisLeft(yScale).tickFormat(d => `${d % 24}:00`));
 }
 
-// ✅ 更新散点图
 function updateScatterPlot(filteredCommits) {
-  const svg = d3.select('#chart svg');
-  const dots = svg.select('.dots');
+    const circles = d3.select('.dots')
+        .selectAll('circle')
+        .data(filteredCommits, d => d.id);
 
-  const circles = dots.selectAll('circle')
-      .data(filteredCommits, d => d.id);
-
-  circles
-      .join(
-          enter => enter.append('circle')
-              .attr('cx', d => xScale(d.datetime))
-              .attr('cy', d => yScale(d.hourFrac))
-              .attr('r', 0)
-              .attr('fill', 'steelblue')
-              .style('fill-opacity', 0.7)
-              .transition().duration(200)
-              .attr('r', d => d.totalLines),
-
-          update => update.transition().duration(200)
-              .attr('cx', d => xScale(d.datetime))
-              .attr('cy', d => yScale(d.hourFrac)),
-
-          exit => exit.transition().duration(200)
-              .attr('r', 0)
-              .style('opacity', 0)
-              .remove()
-      );
+    circles.join(
+        enter => enter.append('circle')
+            .attr('cx', d => xScale(d.datetime))
+            .attr('cy', d => yScale(d.hourFrac))
+            .attr('r', 0)
+            .transition().duration(200)
+            .attr('r', d => rScale(d.totalLines)),
+        update => update,
+        exit => exit.transition().duration(200)
+            .attr('r', 0)
+            .remove()
+    );
 }
 
 
 // ✅ 显示统计信息（**确保在 `main.js` 中声明**）
 function displayStats() {
-    console.log("displayStats() called");
-    // 确保 commits 数据已处理
-    processCommits();
-
-    // 清除现有统计数据，防止重复渲染
     d3.select('#stats').html('');
-
-    // 创建统计信息列表
     const dl = d3.select('#stats').append('dl').attr('class', 'stats');
 
-    // ✅ 代码总行数
     dl.append('dt').html('Total <abbr title="Lines of Code">LOC</abbr>');
     dl.append('dd').text(data.length);
-
-    // ✅ 提交次数
     dl.append('dt').text('Total Commits');
     dl.append('dd').text(commits.length);
 
@@ -281,3 +238,8 @@ function displayStats() {
     dl.append('dd').text(maxDay);
 }
 
+d3.select('#commit-slider')
+    .on('input', function() {
+        commitProgress = +this.value;
+        filterCommits();
+    });
