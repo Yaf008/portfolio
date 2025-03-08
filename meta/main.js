@@ -159,34 +159,31 @@ function createScatterplot() {
 
 // ✅ 更新散点图
 function updateScatterPlot(filteredCommits) {
-    const svg = d3.select('#chart svg');
-    const dots = svg.select('.dots');
+  const svg = d3.select('#chart svg');
+  const dots = svg.select('.dots');
 
-    if (filteredCommits.length === 0) {
-        console.warn("No commits to display.");
-        return;
-    }
+  const circles = dots.selectAll('circle')
+      .data(filteredCommits, d => d.id);
 
-    const circles = dots.selectAll('circle')
-        .data(filteredCommits, d => d.id);
-
-    circles
-        .join(
-            enter => enter.append('circle')
-                .attr('cx', d => xScale(d.datetime))
-                .attr('cy', d => yScale(d.hourFrac))
-                .attr('r', 0)
-                .attr('fill', 'steelblue')
-                .style('fill-opacity', 0.7)
-                .call(enter => enter.transition().duration(200).attr('r', d => d.totalLines)),
-            update => update.transition().duration(200)
-                .attr('cx', d => xScale(d.datetime))
-                .attr('cy', d => yScale(d.hourFrac)),
-                exit => exit.transition()
-                .duration(200)
-                .attr('r', 0)  // 让点缩小，但不删除
-                .style('opacity', 0)
-        );
+  circles
+      .join(
+          enter => enter.append('circle')
+              .attr('cx', d => xScale(d.datetime))
+              .attr('cy', d => yScale(d.hourFrac))
+              .attr('r', 0)
+              .attr('fill', 'steelblue')
+              .style('fill-opacity', 0.7)
+              .call(enter => enter.transition().duration(200).attr('r', d => d.totalLines)),
+          update => update.transition().duration(200)
+              .attr('cx', d => xScale(d.datetime))
+              .attr('cy', d => yScale(d.hourFrac))
+              .style('opacity', 1),  // 确保更新时可见
+          exit => exit.transition()
+              .duration(200)
+              .attr('r', 0)  // 让点缩小
+              .style('opacity', 0)
+              .remove()  // **关键：一定要 `remove()` 否则会导致数据不可恢复**
+      );
 }
 
 // ✅ 显示统计信息（**确保在 `main.js` 中声明**）
