@@ -75,25 +75,33 @@ function updateTimeScale() {
       .range([0, 100]);
 
   commitMaxTime = timeScale.invert(commitProgress);
+  console.log("Updated timeScale domain:", timeScale.domain());
 }
 
 // ✅ 监听滑块事件，实时更新时间 & 过滤数据
 commitSlider.on('input', function () {
   commitProgress = +this.value;
-  console.log("Current commitProgress:", commitProgress);
+  console.log("Slider changed, commitProgress:", commitProgress);
   updateSelectedTime();
   filterCommits();
 });
 
+
 // ✅ 过滤数据并更新可视化
 function filterCommits() {
-  let commitMaxTime = timeScale.invert(commitProgress);
-  
-  // 直接从 `commits` 重新筛选数据，而不是基于已经过滤的数据
+  if (!timeScale) {
+      console.warn("Time scale is not initialized.");
+      return;
+  }
+
+  commitMaxTime = timeScale.invert(commitProgress);
+  console.log("Filtering commits up to:", commitMaxTime);
+
   let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
 
   updateScatterPlot(filteredCommits);
 }
+
 
 // ✅ 创建散点图
 let xScale, yScale;
