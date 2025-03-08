@@ -24,12 +24,13 @@ async function loadData() {
 }
 
 // ✅ 确保 `timeScale` 在数据加载后才计算
-function updateTimeScale() {
-    timeScale = d3.scaleTime()
-        .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
-        .range([0, 100]);
+function filterCommits() {
+  let commitMaxTime = timeScale.invert(commitProgress);
 
-    commitMaxTime = timeScale.invert(commitProgress);
+  // 确保每次都从完整的数据中筛选，而不是依赖之前的过滤结果
+  let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+
+  updateScatterPlot(filteredCommits);
 }
 
 // ✅ 处理提交数据
@@ -162,6 +163,7 @@ function updateScatterPlot(filteredCommits) {
   const svg = d3.select('#chart svg');
   const dots = svg.select('.dots');
 
+  // 重新绑定数据
   const circles = dots.selectAll('circle')
       .data(filteredCommits, d => d.id);
 
@@ -170,21 +172,23 @@ function updateScatterPlot(filteredCommits) {
           enter => enter.append('circle')
               .attr('cx', d => xScale(d.datetime))
               .attr('cy', d => yScale(d.hourFrac))
-              .attr('r', 0)
+              .attr('r', 0)  // 初始半径为 0
               .attr('fill', 'steelblue')
               .style('fill-opacity', 0.7)
-              .call(enter => enter.transition().duration(200).attr('r', d => d.totalLines)),
+              .transition().duration(200)
+              .attr('r', d => d.totalLines),  // 让点恢复到原大小
+
           update => update.transition().duration(200)
               .attr('cx', d => xScale(d.datetime))
-              .attr('cy', d => yScale(d.hourFrac))
-              .style('opacity', 1),  // 确保更新时可见
-          exit => exit.transition()
-              .duration(200)
+              .attr('cy', d => yScale(d.hourFrac)),
+
+          exit => exit.transition().duration(200)
               .attr('r', 0)  // 让点缩小
               .style('opacity', 0)
-              .remove()  // **关键：一定要 `remove()` 否则会导致数据不可恢复**
+              .remove()  // 确保点被移除
       );
 }
+
 
 // ✅ 显示统计信息（**确保在 `main.js` 中声明**）
 function displayStats() {
