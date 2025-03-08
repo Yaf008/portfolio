@@ -363,21 +363,21 @@ img {
 }
 
 
-circle {
-  transition: all 0.3s ease;
-  fill: steelblue;
-  &.selected {
-    fill: orange;
-    stroke: black;
-  }
-  
-  @starting-style {
-    r: 0;
-    opacity: 0;
-  }
-}
 
 
 #commit-slider {
   width: 100%;
+}
+
+#chart { margin: 20px; }
+circle { transition: r 0.2s; }
+circle.selected { stroke: #ff0000; stroke-width: 2px; }
+#tooltip {
+    position: absolute;
+    padding: 10px;
+    background: rgba(255,255,230,0.9);
+    border: 1px solid #ccc;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
