@@ -1,5 +1,6 @@
 let data = [];
 let commits = [];
+let selectedCommits = [];
 
 async function loadData() {
     data = await d3.csv('loc.csv', (row) => ({
@@ -194,14 +195,13 @@ function processCommits() {
       .attr('fill', 'steelblue')
       .style('fill-opacity', 0.7)
       .on('mouseenter', function (event, d) {
-        updateTooltipContent(d);
-        updateTooltipVisibility(true);
+        d3.select(this).classed('selected', isCommitSelected(d));
       })
       .on('mousemove', function (event) {
         updateTooltipPosition(event);
       })
-      .on('mouseleave', function () {
-        updateTooltipVisibility(false);
+      .on('mouseleave', function (event, d) {
+        d3.select(this).classed('selected', isCommitSelected(d));
       });
   
     // Add axes
@@ -270,23 +270,15 @@ function processCommits() {
 
 
   function isCommitSelected(commit) {
-    if (!brushSelection) return false;
-  
-    const min = { x: brushSelection[0][0], y: brushSelection[0][1] };
-    const max = { x: brushSelection[1][0], y: brushSelection[1][1] };
-  
-    const x = xScale(commit.datetime);
-    const y = yScale(commit.hourFrac);
-  
-    return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+    return selectedCommits.includes(commit);
   }
 
 
   function updateSelection() {
     d3.selectAll('circle')
-      .classed('selected', (d) => isCommitSelected(d));
+        .classed('selected', d => isCommitSelected(d));
   }
-  
+
 
   function updateSelectionCount() {
     const selectedCommits = brushSelection
@@ -339,10 +331,20 @@ function processCommits() {
   
 
   function brushed(event) {
-    brushSelection = event.selection;
+    let brushSelection = event.selection;
+    selectedCommits = !brushSelection
+        ? []
+        : commits.filter(commit => {
+            let min = { x: brushSelection[0][0], y: brushSelection[0][1] };
+            let max = { x: brushSelection[1][0], y: brushSelection[1][1] };
+            let x = xScale(commit.datetime);
+            let y = yScale(commit.hourFrac);
+
+            return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+        });
+
     updateSelection();
     updateSelectionCount();
-    updateLanguageBreakdown(); // ✅ Update language breakdown when brushing
-  }
-  
+    updateLanguageBreakdown();
+}
   
