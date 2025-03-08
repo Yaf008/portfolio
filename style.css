@@ -364,14 +364,13 @@ img {
 
 
 circle {
-  transition: all 200ms, r calc(var(--r) * 1ms);
+  transition: all 200ms, r calc(var(--r) * 100ms);
 }
 
 @starting-style {
-  circle {
-    r: 0;
-  }
+  r: 0;
 }
+
 
 #commit-slider {
   width: 100%;
