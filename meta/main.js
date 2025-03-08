@@ -77,10 +77,12 @@ commitSlider.on('input', function () {
 
 // ✅ 过滤数据并更新可视化
 function filterCommits() {
-    let commitMaxTime = timeScale.invert(commitProgress);
-    let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+  let commitMaxTime = timeScale.invert(commitProgress);
+  
+  // 直接从 `commits` 重新筛选数据，而不是基于已经过滤的数据
+  let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
 
-    updateScatterPlot(filteredCommits);
+  updateScatterPlot(filteredCommits);
 }
 
 // ✅ 创建散点图
@@ -179,7 +181,10 @@ function updateScatterPlot(filteredCommits) {
             update => update.transition().duration(200)
                 .attr('cx', d => xScale(d.datetime))
                 .attr('cy', d => yScale(d.hourFrac)),
-            exit => exit.transition().duration(200).attr('r', 0).remove()
+            exit => exit.transition()
+                .duration(200)
+                .style('opacity', 0)  // 先让它透明，而不是直接删除
+                .remove()
         );
 }
 
