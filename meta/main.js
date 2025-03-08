@@ -89,6 +89,93 @@ function updateSelectedTime() {
     selectedTime.text(d3.timeFormat("%Y-%m-%d %H:%M")(commitMaxTime));
 }
 
+// ✅ 创建 Y 轴网格线
+function addHorizontalGridlines(svg, yScale, width, usableArea) {
+  svg.append("g")
+      .attr("class", "grid")
+      .attr("transform", `translate(${usableArea.left}, 0)`)
+      .call(d3.axisLeft(yScale)
+          .tickSize(-width + usableArea.left + usableArea.right)  // 让刻度线变成长线
+          .tickFormat("")  // 隐藏刻度标签
+      )
+      .selectAll("line")
+      .attr("stroke", "#ddd")  // 颜色
+      .attr("stroke-opacity", 0.7)  // 透明度
+      .attr("shape-rendering", "crispEdges");  // 保持清晰
+}
+
+// ✅ 在 `createScatterplot()` 内调用它
+function createScatterplot() {
+  const width = 1000;
+  const height = 600;
+  const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+
+  const usableArea = {
+      top: margin.top,
+      right: width - margin.right,
+      bottom: height - margin.bottom,
+      left: margin.left,
+      width: width - margin.left - margin.right,
+      height: height - margin.top - margin.bottom,
+  };
+
+  const svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .style('overflow', 'visible');
+
+  xScale = d3
+      .scaleTime()
+      .domain(d3.extent(commits, (d) => d.datetime))
+      .range([usableArea.left, usableArea.right])
+      .nice();
+
+  yScale = d3
+      .scaleLinear()
+      .domain([0, 24])
+      .range([usableArea.bottom, usableArea.top]);
+
+  // ✅ 添加背景网格线
+  addHorizontalGridlines(svg, yScale, width, usableArea);
+
+  const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
+  const rScale = d3.scaleSqrt().domain([minLines, maxLines]).range([2, 30]);
+
+  const dots = svg.append('g').attr('class', 'dots');
+
+  dots
+      .selectAll('circle')
+      .data(commits)
+      .join('circle')
+      .attr('cx', (d) => xScale(d.datetime))
+      .attr('cy', (d) => yScale(d.hourFrac))
+      .attr('r', (d) => rScale(d.totalLines))
+      .attr('fill', 'steelblue')
+      .style('fill-opacity', 0.7)
+      .on('mouseenter', function (event, d) {
+          updateTooltipContent(d);
+          updateTooltipVisibility(true);
+      })
+      .on('mousemove', function (event) {
+          updateTooltipPosition(event);
+      })
+      .on('mouseleave', function () {
+          updateTooltipVisibility(false);
+      });
+
+  const xAxis = d3.axisBottom(xScale).ticks(6);
+  svg.append('g')
+      .attr('transform', `translate(0, ${usableArea.bottom})`)
+      .call(xAxis);
+
+  const yAxis = d3.axisLeft(yScale).tickFormat((d) => `${d % 24}:00`);
+  svg.append('g')
+      .attr('transform', `translate(${usableArea.left}, 0)`)
+      .call(yAxis);
+}
+
 // 散点图相关
 let xScale, yScale;
 
