@@ -262,15 +262,12 @@ function processCommits() {
   }
 
   function brushSelector() {
-  const svg = document.querySelector('svg');
+    const svg = document.querySelector('svg');
 
-  d3.select(svg)
-    .call(d3.brush().on('start brush end', brushed));
-
-  // Raise dots above brush overlay
-  d3.select(svg).selectAll('.dots, .overlay ~ *').raise();
+    d3.select(svg)
+        .call(d3.brush()
+            .on('start brush end', brushed)); 
   }
-
 
   function isCommitSelected(commit) {
     return selectedCommits.includes(commit);
@@ -289,10 +286,7 @@ function processCommits() {
       : [];
   
     const countElement = document.getElementById('selection-count');
-    countElement.textContent = `${
-      selectedCommits.length || 'No'
-    } commits selected`;
-  
+    countElement.textContent = `${selectedCommits.length || 'No'} commits selected`;
     return selectedCommits;
   }
 
