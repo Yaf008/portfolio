@@ -195,12 +195,15 @@ function processCommits() {
       .attr('fill', 'steelblue')
       .style('fill-opacity', 0.7)
       .on('mouseenter', function (event, d) {
+        updateTooltipContent(d);
+        updateTooltipVisibility(true);
         d3.select(this).classed('selected', isCommitSelected(d));
       })
       .on('mousemove', function (event) {
         updateTooltipPosition(event);
       })
       .on('mouseleave', function (event, d) {
+        updateTooltipVisibility(false);
         d3.select(this).classed('selected', isCommitSelected(d));
       });
   
