@@ -1,223 +1,260 @@
-// 全局变量声明
 let data = [];
 let commits = [];
-let filteredCommits = [];
+let selectedCommits = [];
 let commitProgress = 100;
 let timeScale;
 let commitMaxTime;
-let xScale, yScale, rScale;
-let brushSelection = null;
 
-// 可视化参数
-const width = 1000;
-const height = 600;
-const margin = { top: 20, right: 30, bottom: 50, left: 60 };
-
-// DOM加载完成后初始化
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        await loadData();
-        setupSlider();
-    } catch (error) {
-        console.error("初始化失败:", error);
-        alert("数据加载失败，请检查控制台日志");
-    }
-});
-
-// 数据加载处理
+// ✅ 异步加载数据
 async function loadData() {
-    try {
-        data = await d3.csv('loc.csv', rowParser);
-        if (!data.length) throw new Error('数据集为空');
-        
-        processCommits();
-        updateTimeScale();
-        displayStats();
-        createScatterplot();
-        brushSelector();
-    } catch (error) {
-        throw new Error(`数据加载失败: ${error.message}`);
-    }
-}
-
-// CSV行解析器
-function rowParser(row) {
-    return {
+    data = await d3.csv('loc.csv', (row) => ({
         ...row,
         line: Number(row.line),
         depth: Number(row.depth),
         length: Number(row.length),
+        date: new Date(row.date + 'T00:00' + row.timezone),
         datetime: new Date(row.datetime),
-        file: row.file.trim()
-    };
+    }));
+
+    processCommits();
+    updateTimeScale();
+    displayStats();
+    createScatterplot();
+    brushSelector();
 }
 
-// 处理提交数据
-function processCommits() {
-    commits = d3.groups(data, d => d.commit)
-        .map(([commit, lines]) => ({
-            id: commit,
-            url: `https://github.com/YOUR_REPO/commit/${commit}`,
-            author: lines[0].author,
-            datetime: lines[0].datetime,
-            hourFrac: lines[0].datetime.getHours() + 
-                     lines[0].datetime.getMinutes() / 60,
-            totalLines: lines.length,
-            lines: Object.freeze(lines)
-        }));
-}
-
-// 更新时间比例尺
+// ✅ 确保 `timeScale` 在数据加载后才计算
 function updateTimeScale() {
     timeScale = d3.scaleTime()
-        .domain(d3.extent(commits, d => d.datetime))
-        .range([0, 100])
-        .nice();
+        .domain([d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)])
+        .range([0, 100]);
+
     commitMaxTime = timeScale.invert(commitProgress);
 }
 
-// 统计信息展示
-function displayStats() {
-    const dl = d3.select('#stats').html('').append('dl').attr('class', 'stats');
+// ✅ 处理提交数据
+function processCommits() {
+    commits = d3.groups(data, (d) => d.commit)
+        .map(([commit, lines]) => {
+            let first = lines[0]; 
 
-    const statsData = {
-        'Total LOC': data.length,
-        'Total Commits': commits.length,
-        'Total Files': d3.rollups(data, v => v.length, d => d.file).size,
-        'Longest Line': d3.max(data, d => d.length),
-        'Maximum Depth': d3.max(data, d => d.depth),
-        'Most Active Time': getMostActive('dayPeriod'),
-        'Most Active Day': getMostActive('weekday')
-    };
-
-    Object.entries(statsData).forEach(([label, value]) => {
-        dl.append('dt').text(label);
-        dl.append('dd').text(value || 'N/A');
-    });
+            return {
+                id: commit,
+                url: `https://github.com/YOUR_REPO/commit/${commit}`,
+                author: first.author,
+                date: first.date,
+                time: first.time,
+                timezone: first.timezone,
+                datetime: first.datetime,
+                hourFrac: first.datetime.getHours() + first.datetime.getMinutes() / 60,
+                totalLines: lines.length,
+                lines,
+            };
+        });
 }
 
-// 获取最活跃时段/日期
-function getMostActive(type) {
-    const formatOpts = {
-        dayPeriod: { dayPeriod: 'short' },
-        weekday: { weekday: 'long' }
-    };
-    return d3.greatest(
-        d3.rollups(data, 
-            v => v.length,
-            d => d.datetime.toLocaleString('en', formatOpts[type])
-        ),
-        d => d[1]
-    )?.[0] || 'N/A';
+// ✅ 监听 `DOMContentLoaded` 事件，确保 HTML 加载完毕再运行 JavaScript
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+});
+
+// ✅ 绑定滑块和时间显示
+const commitSlider = d3.select('#commit-slider');
+const selectedTime = d3.select('#selectedTime');
+
+// ✅ 更新滑块对应的时间
+function updateSelectedTime() {
+    commitMaxTime = timeScale.invert(commitProgress);
+    selectedTime.text(commitMaxTime.toLocaleString());
 }
 
-// 散点图创建
+// ✅ 监听滑块事件，实时更新时间 & 过滤数据
+commitSlider.on('input', function () {
+    commitProgress = +this.value;
+    updateSelectedTime();
+    filterCommits();
+});
+
+// ✅ 过滤数据并更新可视化
+function filterCommits() {
+    let commitMaxTime = timeScale.invert(commitProgress);
+    let filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+
+    updateScatterPlot(filteredCommits);
+}
+
+// ✅ 创建散点图
+let xScale, yScale;
+
 function createScatterplot() {
-    const svg = d3.select('#chart')
+    const width = 1000;
+    const height = 600;
+    const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+
+    const usableArea = {
+        top: margin.top,
+        right: width - margin.right,
+        bottom: height - margin.bottom,
+        left: margin.left,
+        width: width - margin.left - margin.right,
+        height: height - margin.top - margin.bottom,
+    };
+
+    const svg = d3
+        .select('#chart')
         .append('svg')
         .attr('width', width)
-        .attr('height', height);
+        .attr('height', height)
+        .style('overflow', 'visible');
 
-    // 比例尺初始化
-    xScale = d3.scaleTime()
-        .domain(d3.extent(commits, d => d.datetime))
-        .range([margin.left, width - margin.right]);
+    xScale = d3
+        .scaleTime()
+        .domain(d3.extent(commits, (d) => d.datetime))
+        .range([usableArea.left, usableArea.right])
+        .nice();
 
-    yScale = d3.scaleLinear()
+    yScale = d3
+        .scaleLinear()
         .domain([0, 24])
-        .range([height - margin.bottom, margin.top]);
+        .range([usableArea.bottom, usableArea.top]);
 
-    rScale = d3.scaleSqrt()
-        .domain(d3.extent(commits, d => d.totalLines))
-        .range([3, 25]);
+    const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
+    const rScale = d3.scaleSqrt().domain([minLines, maxLines]).range([2, 30]);
 
-    // 坐标轴
-    svg.append('g')
-        .attr('transform', `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(xScale).ticks(6));
+    const dots = svg.append('g').attr('class', 'dots');
 
-    svg.append('g')
-        .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(yScale).tickFormat(d => `${d % 24}:00`));
-
-    // 数据点
-    svg.selectAll('circle')
+    dots
+        .selectAll('circle')
         .data(commits)
         .join('circle')
-        .attr('cx', d => xScale(d.datetime))
-        .attr('cy', d => yScale(d.hourFrac))
-        .attr('r', d => rScale(d.totalLines))
+        .attr('cx', (d) => xScale(d.datetime))
+        .attr('cy', (d) => yScale(d.hourFrac))
+        .attr('r', (d) => rScale(d.totalLines))
         .attr('fill', 'steelblue')
-        .style('opacity', 0.7)
-        .on('mouseover', showTooltip)
-        .on('mouseout', hideTooltip);
+        .style('fill-opacity', 0.7)
+        .on('mouseenter', function (event, d) {
+            updateTooltipContent(d);
+            updateTooltipVisibility(true);
+        })
+        .on('mousemove', function (event) {
+            updateTooltipPosition(event);
+        })
+        .on('mouseleave', function () {
+            updateTooltipVisibility(false);
+        });
+
+    const xAxis = d3.axisBottom(xScale).ticks(6);
+    svg.append('g')
+        .attr('transform', `translate(0, ${usableArea.bottom})`)
+        .call(xAxis);
+
+    const yAxis = d3.axisLeft(yScale).tickFormat((d) => `${d % 24}:00`);
+    svg.append('g')
+        .attr('transform', `translate(${usableArea.left}, 0)`)
+        .call(yAxis);
 }
 
-// 散点图更新
-function updateScatterPlot(filteredData) {
-    d3.select('#chart svg').selectAll('circle')
-        .data(filteredData, d => d.id)
+// ✅ 更新散点图
+function updateScatterPlot(filteredCommits) {
+    const svg = d3.select('#chart svg');
+    const dots = svg.select('.dots');
+
+    if (filteredCommits.length === 0) {
+        console.warn("No commits to display.");
+        return;
+    }
+
+    const circles = dots.selectAll('circle')
+        .data(filteredCommits, d => d.id);
+
+    circles
         .join(
             enter => enter.append('circle')
-                .call(enter => enter.transition().duration(200)
-                    .attr('cx', d => xScale(d.datetime))
-                    .attr('cy', d => yScale(d.hourFrac))
-                    .attr('r', d => rScale(d.totalLines)),
-            update => update,
-            exit => exit.remove()
+                .attr('cx', d => xScale(d.datetime))
+                .attr('cy', d => yScale(d.hourFrac))
+                .attr('r', 0)
+                .attr('fill', 'steelblue')
+                .style('fill-opacity', 0.7)
+                .call(enter => enter.transition().duration(200).attr('r', d => d.totalLines)),
+            update => update.transition().duration(200)
+                .attr('cx', d => xScale(d.datetime))
+                .attr('cy', d => yScale(d.hourFrac)),
+            exit => exit.transition().duration(200).attr('r', 0).remove()
         );
 }
 
-// 滑块设置
-function setupSlider() {
-    const commitSlider = d3.select('#commit-slider');
-    const selectedTime = d3.select('#selectedTime');
+// ✅ 显示统计信息（**确保在 `main.js` 中声明**）
+function displayStats() {
+    console.log("displayStats() called");
+    // 确保 commits 数据已处理
+    processCommits();
 
-    commitSlider.on('input', function() {
-        commitProgress = +this.value;
-        commitMaxTime = timeScale.invert(commitProgress);
-        selectedTime.text(commitMaxTime.toLocaleString());
-        filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-        updateScatterPlot(filteredCommits);
-    });
-}
+    // 清除现有统计数据，防止重复渲染
+    d3.select('#stats').html('');
 
-// 刷选功能
-function brushSelector() {
-    const brush = d3.brush()
-        .extent([[margin.left, margin.top], 
-                [width - margin.right, height - margin.bottom]])
-        .on('brush', brushed)
-        .on('end', brushended);
+    // 创建统计信息列表
+    const dl = d3.select('#stats').append('dl').attr('class', 'stats');
 
-    d3.select('svg').call(brush);
-}
+    // ✅ 代码总行数
+    dl.append('dt').html('Total <abbr title="Lines of Code">LOC</abbr>');
+    dl.append('dd').text(data.length);
 
-function brushed(event) {
-    const selection = event.selection;
-    d3.selectAll('circle').classed('selected', d => 
-        selection && 
-        xScale(d.datetime) >= selection[0][0] &&
-        xScale(d.datetime) <= selection[1][0] &&
-        yScale(d.hourFrac) >= selection[0][1] &&
-        yScale(d.hourFrac) <= selection[1][1]
+    // ✅ 提交次数
+    dl.append('dt').text('Total Commits');
+    dl.append('dd').text(commits.length);
+
+    // ✅ 代码库文件数量
+    const fileCount = d3.group(data, d => d.file).size;
+    dl.append('dt').text('Total Files');
+    dl.append('dd').text(fileCount);
+
+    // ✅ 最大文件长度（以行计）
+    const maxFileLength = d3.max(data, d => d.line);
+    dl.append('dt').text('Longest File (Lines)');
+    dl.append('dd').text(maxFileLength);
+
+    // ✅ 平均文件长度（以行计）
+    const fileLengths = d3.rollups(
+        data,
+        v => d3.max(v, d => d.line),
+        d => d.file
     );
-}
+    const avgFileLength = d3.mean(fileLengths, d => d[1]);
+    dl.append('dt').text('Average File Length (Lines)');
+    dl.append('dd').text(avgFileLength.toFixed(2));
 
-// 工具提示功能
-function showTooltip(event, d) {
-    d3.select('#tooltip')
-        .style('left', `${event.pageX + 15}px`)
-        .style('top', `${event.pageY + 15}px`)
-        .html(`
-            <strong>提交ID:</strong> ${d.id.slice(0,7)}<br>
-            <strong>作者:</strong> ${d.author}<br>
-            <strong>时间:</strong> ${d.datetime.toLocaleString()}<br>
-            <strong>修改行数:</strong> ${d.totalLines}
-        `)
-        .style('opacity', 1);
-}
+    // ✅ 平均行长（以字符计）
+    const avgLineLength = d3.mean(data, d => d.length);
+    dl.append('dt').text('Average Line Length (Characters)');
+    dl.append('dd').text(avgLineLength.toFixed(2));
 
-function hideTooltip() {
-    d3.select('#tooltip').style('opacity', 0);
+    // ✅ 最长的行（以字符计）
+    const maxLineLength = d3.max(data, d => d.length);
+    dl.append('dt').text('Longest Line (Characters)');
+    dl.append('dd').text(maxLineLength);
+
+    // ✅ 最大深度
+    const maxDepth = d3.max(data, d => d.depth);
+    dl.append('dt').text('Maximum Depth');
+    dl.append('dd').text(maxDepth);
+
+    // ✅ 一天中大部分工作完成的时间
+    const workByPeriod = d3.rollups(
+        data,
+        v => v.length,
+        d => new Date(d.datetime).toLocaleString('en', { dayPeriod: 'short' })
+    );
+    const maxPeriod = d3.greatest(workByPeriod, d => d[1])?.[0];
+    dl.append('dt').text('Most Active Time of Day');
+    dl.append('dd').text(maxPeriod);
+
+    // ✅ 一周中工作最多的一天
+    const workByDay = d3.rollups(
+        data,
+        v => v.length,
+        d => new Date(d.datetime).toLocaleString('en', { weekday: 'long' })
+    );
+    const maxDay = d3.greatest(workByDay, d => d[1])?.[0];
+    dl.append('dt').text('Most Active Day of the Week');
+    dl.append('dd').text(maxDay);
 }
